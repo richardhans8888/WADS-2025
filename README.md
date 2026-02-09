@@ -6,7 +6,7 @@
 [![Institution](https://img.shields.io/badge/Institution-BINUS%20International-orange)](https://binus.ac.id)
 [![Class](https://img.shields.io/badge/Class-L4AC-green)]()
 
-##  Project Information
+##  1. Project Information
 
 - **Project Title:** Classmate
 - **Project Domain:** Student Community & Collaboration Platform
@@ -22,25 +22,9 @@
 
 ---
 
-## Instructor & Repository Access
-
-This repository is shared with:
-
-**Instructor:**
-- Name: Ida Bagus Kerthyayana Manuaba
-- Email: imanuaba@binus.edu
-- GitHub: [@bagzcode](https://github.com/bagzcode)
-
-**Instructor Assistant:**
-- Name: Juwono
-- Email: juwono@binus.edu
-- GitHub: [@Juwono136](https://github.com/Juwono136)
-
----
-
 ##  Project Overview
 
-### 3.1 Problem Statement
+### 2.1 Problem Statement
 
 **What problem does this application solve?**
 
@@ -50,7 +34,7 @@ This repository is shared with:
 
 [Define your target user demographic]
 
-### 3.2 Solution Overview
+### 2.2 Solution Overview
 
 **Main Features:**
 
@@ -68,7 +52,7 @@ This repository is shared with:
 
 ---
 
-##  Technology Stack
+##  3. Technology Stack
 
 | Layer | Technology |
 |-------|-----------|
@@ -82,9 +66,9 @@ This repository is shared with:
 
 ---
 
-## System Architecture
+## 4. System Architecture
 
-### 5.1 Architecture Diagram
+### 4.1 Architecture Diagram
 ```
 [Insert architecture diagram image or ASCII diagram here]
 ```
@@ -109,7 +93,7 @@ Example ASCII diagram:
 └─────────────┘
 -->
 
-### 5.2 Architecture Explanation
+### 4.2 Architecture Explanation
 
 **Frontend ↔ API ↔ Database Interaction:**
 
