@@ -70,6 +70,7 @@
 
 ### 4.1 Architecture Diagram
 ![Architecture Diagram](../pics/arc.png)
+
 ```
 
 <!-- 
@@ -91,6 +92,7 @@ Example ASCII diagram:
 │ (PostgreSQL)│
 └─────────────┘
 -->
+```
 
 ### 4.2 Architecture Explanation
 
