@@ -70,7 +70,7 @@
 
 ### 4.1 Architecture Diagram
 ```
-[Insert architecture diagram image or ASCII diagram here]
+![Architecture Diagram](../pics/arc.png)
 ```
 
 <!-- 
