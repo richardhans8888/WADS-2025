@@ -69,7 +69,6 @@
 ## 4. System Architecture
 
 ### 4.1 Architecture Diagram
-```
 ![Architecture Diagram](../pics/arc.png)
 ```
 
