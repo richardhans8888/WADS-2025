@@ -1,13 +1,34 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Dashboard from '@/components/Dashboard';
 import { Header } from '@/components/layout/Header';
 import { Button } from '@/components/ui/Button';
+import { BookOpen, Moon } from 'lucide-react';
+import ColorThief from 'colorthief';
 
 export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [themeColor, setThemeColor] = useState('#5A3DFF'); // Default purple
+
+  useEffect(() => {
+    const img = new Image();
+    img.src = '/011620_Features_KS_004_2500.webp';
+    img.crossOrigin = 'Anonymous';
+    
+    img.onload = () => {
+      try {
+        const colorThief = new ColorThief();
+        const color = colorThief.getColor(img);
+        if (color) {
+          setThemeColor(`rgb(${color[0]}, ${color[1]}, ${color[2]})`);
+        }
+      } catch (error) {
+        console.error("Error extracting color:", error);
+      }
+    };
+  }, []);
 
   if (isLoggedIn) {
     return (
@@ -21,29 +42,60 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col lg:flex-row relative overflow-hidden">
-      {/* Left Panel - Logo */}
-      <div className="flex-1 flex items-center justify-center p-10 lg:p-0">
-         {/* Large ClassMate Logo */}
-         <div className="relative w-64 h-64 lg:w-96 lg:h-96">
-            <svg viewBox="0 0 100 100" className="w-full h-full text-white fill-current">
-               {/* Abstract C Logo */}
-               <path d="M50 10 C20 10 10 35 10 50 C10 65 20 90 50 90 L80 90 L80 75 L50 75 C35 75 25 65 25 50 C25 35 35 25 50 25 L80 25 L80 10 L50 10 Z" />
-            </svg>
-         </div>
+    <div className="min-h-screen bg-white flex flex-col lg:flex-row">
+      {/* Left Panel - Illustration & Quote */}
+      <div className="hidden lg:flex lg:w-1/2 relative bg-gray-900 overflow-hidden">
+        {/* Background Image */}
+        <div 
+            className="absolute inset-0 z-0 bg-cover bg-center"
+            style={{ 
+               backgroundImage: `url('/011620_Features_KS_004_2500.webp')`,
+               filter: 'brightness(0.7)'
+            }}
+        />
+        
+        {/* Quote Content */}
+        <div className="relative z-10 mt-auto p-12 w-full max-w-2xl">
+            <div className="bg-black/30 backdrop-blur-sm p-2 rounded-full w-fit mb-6 border border-white/10">
+               <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
+               </svg>
+            </div>
+            <blockquote className="font-serif text-4xl md:text-5xl font-medium text-white leading-tight mb-6">
+               "Education is the passport to the future, for tomorrow belongs to those who prepare for it today."
+            </blockquote>
+            <div className="flex items-center text-white/80 font-medium">
+               <div className="h-px w-8 bg-white/50 mr-3"></div>
+               ClassMate Community
+            </div>
+        </div>
       </div>
 
-      {/* Right Panel - Auth Content */}
-      <div className="flex-1 flex flex-col justify-center px-8 lg:px-20 py-10 z-10">
-        <div className="max-w-md w-full mx-auto lg:mx-0">
-          <h1 className="text-5xl md:text-6xl font-extrabold mb-12 tracking-tight">Happening now</h1>
+      {/* Right Panel - Auth Form */}
+      <div className="flex-1 flex flex-col justify-center px-8 lg:px-24 py-10 relative">
+        {/* Theme Toggle */}
+        <button className="absolute top-8 right-8 text-gray-400 hover:text-gray-600">
+            <Moon className="w-5 h-5" />
+        </button>
+
+        <div className="max-w-[480px] w-full mx-auto lg:mx-0">
+          {/* Logo */}
+          <div className="flex items-center gap-3 mb-12">
+            <div className="p-2 rounded-lg transition-colors duration-500" style={{ backgroundColor: themeColor }}>
+               <BookOpen className="w-6 h-6 text-white" />
+            </div>
+            <span className="text-xl font-bold text-gray-900 tracking-tight">ClassMate</span>
+          </div>
+
+          <h1 className="font-serif text-5xl md:text-[56px] font-bold text-gray-900 mb-3 tracking-tight">Happening now</h1>
+          <p className="text-2xl font-medium text-gray-500 mb-12">Join ClassMate today.</p>
           
-          <h2 className="text-3xl font-bold mb-8">Join ClassMate today.</h2>
-          
-          <div className="space-y-4 w-full max-w-xs">
+          <div className="space-y-4">
             <Button 
               variant="outline" 
-              className="w-full rounded-full bg-white text-black hover:bg-gray-100 border-none h-10 font-bold flex items-center justify-center gap-2"
+              className="w-full rounded-full bg-white text-gray-700 hover:bg-gray-50 border-gray-200 h-12 font-medium text-base flex items-center justify-center gap-3 transition-all"
               onClick={() => setIsLoggedIn(true)}
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -57,7 +109,7 @@ export default function Home() {
             
             <Button 
               variant="outline" 
-              className="w-full rounded-full bg-white text-black hover:bg-gray-100 border-none h-10 font-bold flex items-center justify-center gap-2"
+              className="w-full rounded-full bg-white text-gray-700 hover:bg-gray-50 border-gray-200 h-12 font-medium text-base flex items-center justify-center gap-3 transition-all"
               onClick={() => setIsLoggedIn(true)}
             >
                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -66,28 +118,30 @@ export default function Home() {
               Sign up with Apple
             </Button>
 
-            <div className="flex items-center gap-2">
-               <div className="h-px bg-gray-700 flex-1"></div>
-               <span className="text-sm text-gray-500">or</span>
-               <div className="h-px bg-gray-700 flex-1"></div>
+            <div className="flex items-center gap-3 py-2">
+               <div className="h-px bg-gray-200 flex-1"></div>
+               <span className="text-sm text-gray-400 pb-1">or</span>
+               <div className="h-px bg-gray-200 flex-1"></div>
             </div>
 
             <Button 
-               className="w-full rounded-full bg-blue-600 hover:bg-blue-700 text-white border-none h-10 font-bold"
+               className="w-full rounded-full text-white border-none h-12 font-bold text-base shadow-sm hover:shadow transition-all duration-500 hover:brightness-110"
+               style={{ backgroundColor: themeColor }}
                onClick={() => setIsLoggedIn(true)}
             >
                Create account
             </Button>
 
-            <p className="text-[10px] text-gray-500 leading-tight">
-               By signing up, you agree to the <span className="text-blue-500 cursor-pointer">Terms of Service</span> and <span className="text-blue-500 cursor-pointer">Privacy Policy</span>, including <span className="text-blue-500 cursor-pointer">Cookie Use</span>.
+            <p className="text-[11px] text-gray-500 leading-normal max-w-sm">
+               By signing up, you agree to the <a href="#" className="hover:underline transition-colors duration-500" style={{ color: themeColor }}>Terms of Service</a> and <a href="#" className="hover:underline transition-colors duration-500" style={{ color: themeColor }}>Privacy Policy</a>, including <a href="#" className="hover:underline transition-colors duration-500" style={{ color: themeColor }}>Cookie Use</a>.
             </p>
 
-            <div className="pt-10">
-               <h3 className="text-lg font-bold mb-4">Already have an account?</h3>
+            <div className="pt-12">
+               <h3 className="text-base font-bold text-gray-900 mb-4">Already have an account?</h3>
                <Button 
                   variant="outline" 
-                  className="w-full rounded-full bg-transparent text-blue-500 border-gray-700 hover:bg-blue-900/10 h-10 font-bold"
+                  className="w-full rounded-full bg-white border-gray-200 hover:bg-gray-50 h-12 font-bold text-base transition-colors duration-500"
+                  style={{ color: themeColor }}
                   onClick={() => setIsLoggedIn(true)}
                >
                   Sign in
@@ -96,26 +150,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-
-      {/* Footer */}
-      <footer className="absolute bottom-4 w-full text-center text-[11px] text-gray-500 hidden lg:block">
-         <div className="flex justify-center gap-4 flex-wrap px-4">
-            <span className="hover:underline cursor-pointer">About</span>
-            <span className="hover:underline cursor-pointer">Help Center</span>
-            <span className="hover:underline cursor-pointer">Terms of Service</span>
-            <span className="hover:underline cursor-pointer">Privacy Policy</span>
-            <span className="hover:underline cursor-pointer">Cookie Policy</span>
-            <span className="hover:underline cursor-pointer">Accessibility</span>
-            <span className="hover:underline cursor-pointer">Ads info</span>
-            <span className="hover:underline cursor-pointer">Blog</span>
-            <span className="hover:underline cursor-pointer">Careers</span>
-            <span className="hover:underline cursor-pointer">Brand Resources</span>
-            <span className="hover:underline cursor-pointer">Advertising</span>
-            <span className="hover:underline cursor-pointer">Marketing</span>
-            <span className="hover:underline cursor-pointer">Developers</span>
-            <span className="hover:underline cursor-pointer">© 2026 ClassMate Corp.</span>
-         </div>
-      </footer>
     </div>
   );
 }
