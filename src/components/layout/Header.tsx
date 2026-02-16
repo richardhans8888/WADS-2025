@@ -8,7 +8,7 @@ export function Header() {
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-2">
-            <span className="text-2xl font-bold text-blue-600">EduConnect</span>
+            <span className="text-2xl font-bold text-blue-600">ClassMate</span>
           </Link>
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-600">
             <Link href="/forums" className="hover:text-blue-600 transition-colors">
