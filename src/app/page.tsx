@@ -9,18 +9,15 @@ import { BookOpen, Moon } from 'lucide-react';
 import ColorThief from 'colorthief';
 
 export default function Home() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [themeColor, setThemeColor] = useState('#5A3DFF'); // Default purple
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('isLoggedIn') === 'true';
+    }
+    return false;
+  });
+  const [themeColor, setThemeColor] = useState('#5A3DFF');
 
   useEffect(() => {
-    // Check local storage for login status
-    const storedLogin = localStorage.getItem('isLoggedIn');
-    if (storedLogin === 'true') {
-      setIsLoggedIn(true);
-    }
-    setIsLoading(false);
-
     const img = new Image();
     img.src = '/011620_Features_KS_004_2500.webp';
     img.crossOrigin = 'Anonymous';
@@ -42,10 +39,6 @@ export default function Home() {
     setIsLoggedIn(true);
     localStorage.setItem('isLoggedIn', 'true');
   };
-
-  if (isLoading) {
-    return null; // Or a loading spinner
-  }
 
   if (isLoggedIn) {
     return (
