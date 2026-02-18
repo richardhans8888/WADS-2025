@@ -16,7 +16,6 @@ export function Footer() {
             <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
               <li><Link href="/forums" className="hover:text-blue-600">Forums</Link></li>
               <li><Link href="/tutors" className="hover:text-blue-600">Find Tutors</Link></li>
-              <li><Link href="/materials" className="hover:text-blue-600">Study Materials</Link></li>
             </ul>
           </div>
           <div>
