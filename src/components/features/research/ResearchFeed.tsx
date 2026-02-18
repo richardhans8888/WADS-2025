@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Filter, Search, Clock, ArrowRight, BookOpen, GraduationCap, Building2, User } from 'lucide-react';
+import { Filter, Search, Clock, ArrowRight, BookOpen, GraduationCap, Building2, User, ChevronDown, Check } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
 // Types for our articles
@@ -273,6 +273,75 @@ const articles: Article[] = [
   }
 ];
 
+interface FilterDropdownProps {
+  label: string;
+  value: string;
+  options: string[];
+  onChange: (value: string) => void;
+}
+
+function FilterDropdown({ label, value, options, onChange }: FilterDropdownProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <div className="flex items-center gap-3">
+        <span className="text-sm text-gray-400 font-medium">{label}:</span>
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="flex items-center justify-between min-w-[160px] bg-[#1F2937] hover:bg-[#374151] border border-gray-700 rounded-lg text-sm px-4 py-2 text-gray-200 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+        >
+          <span className="truncate">{value}</span>
+          <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+        </button>
+      </div>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 8, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 8, scale: 0.95 }}
+            transition={{ duration: 0.15, ease: "easeOut" }}
+            className="absolute top-full left-[calc(100%-160px)] mt-2 w-56 bg-[#1F2937]/95 backdrop-blur-xl border border-gray-700 rounded-xl shadow-2xl z-50 overflow-hidden"
+          >
+            <div className="py-1 max-h-[300px] overflow-y-auto custom-scrollbar">
+              {options.map((option) => (
+                <button
+                  key={option}
+                  onClick={() => {
+                    onChange(option);
+                    setIsOpen(false);
+                  }}
+                  className={`w-full text-left px-4 py-2.5 text-sm flex items-center justify-between transition-colors ${
+                    value === option 
+                      ? 'bg-blue-600 text-white font-medium' 
+                      : 'text-gray-300 hover:bg-[#374151] hover:text-white'
+                  }`}
+                >
+                  {option}
+                  {value === option && <Check className="w-4 h-4" />}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 export function ResearchFeed() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [activeSource, setActiveSource] = useState("Any");
@@ -309,48 +378,36 @@ export function ResearchFeed() {
       </div>
 
       {/* Filters Bar */}
-      <div className="bg-white dark:bg-[#1E293B] p-4 rounded-xl border border-gray-200 dark:border-gray-800 mb-8 flex flex-col md:flex-row gap-6 items-center shadow-sm">
-        <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-medium text-sm">
+      <div className="bg-[#111827] p-3 rounded-2xl border border-gray-800 mb-8 flex flex-col md:flex-row gap-6 items-center shadow-lg">
+        <div className="flex items-center gap-2 text-gray-400 font-medium text-sm pl-2">
           <Filter className="w-4 h-4" />
           <span>Filters:</span>
         </div>
 
-        <div className="flex flex-wrap gap-4 flex-1">
+        <div className="flex flex-wrap gap-6 flex-1">
           {/* Subject Filter */}
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600 dark:text-gray-300">Subject:</span>
-            <select 
-              value={activeCategory}
-              onChange={(e) => setActiveCategory(e.target.value)}
-              className="bg-gray-100 dark:bg-[#0F172A] border-none rounded-lg text-sm px-3 py-1.5 focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white cursor-pointer"
-            >
-              {categories.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
-          </div>
+          <FilterDropdown 
+            label="Subject" 
+            value={activeCategory} 
+            options={categories} 
+            onChange={setActiveCategory} 
+          />
 
           {/* Source Filter */}
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600 dark:text-gray-300">Source:</span>
-            <select 
-              value={activeSource}
-              onChange={(e) => setActiveSource(e.target.value)}
-              className="bg-gray-100 dark:bg-[#0F172A] border-none rounded-lg text-sm px-3 py-1.5 focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white cursor-pointer"
-            >
-              {sources.map(src => (
-                <option key={src} value={src}>{src}</option>
-              ))}
-            </select>
-          </div>
+          <FilterDropdown 
+            label="Source" 
+            value={activeSource} 
+            options={sources} 
+            onChange={setActiveSource} 
+          />
         </div>
 
-        <div className="relative w-full md:w-64">
+        <div className="relative w-full md:w-72">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input 
             type="text" 
             placeholder="Search articles..." 
-            className="w-full bg-gray-100 dark:bg-[#0F172A] border-none rounded-lg pl-9 pr-4 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
+            className="w-full bg-[#1F2937] border border-gray-700 hover:border-gray-600 rounded-lg pl-10 pr-4 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-200 placeholder-gray-500 transition-colors"
           />
         </div>
       </div>
