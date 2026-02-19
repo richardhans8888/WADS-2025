@@ -457,7 +457,7 @@ export default function TutorsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredCourses.length > 0 ? (
             filteredCourses.map((m) => (
-            <div key={m.code} className="bg-white dark:bg-[#1e293b] rounded-2xl p-6 flex flex-col justify-between h-full hover:bg-gray-50 dark:hover:bg-[#253045] transition-colors shadow-sm">
+            <Link href={`/session/${m.title.toLowerCase().replace(/ /g, '-')}`} key={m.code} className="bg-white dark:bg-[#1e293b] rounded-2xl p-6 flex flex-col justify-between h-full hover:bg-gray-50 dark:hover:bg-[#253045] transition-colors shadow-sm cursor-pointer block">
               <div>
                 <div className="flex justify-between items-start mb-4">
                   <span className={`text-xs font-bold px-3 py-1 rounded-full ${m.color}`}>
@@ -486,7 +486,7 @@ export default function TutorsPage() {
                 <span className="text-gray-400">•</span>
                 <span className="text-gray-500">{m.tag}</span>
               </div>
-            </div>
+            </Link>
           ))
           ) : (
             <div className="col-span-full py-12 text-center text-gray-500 dark:text-gray-400">

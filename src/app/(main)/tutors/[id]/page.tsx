@@ -1,6 +1,8 @@
 "use client";
 
+import Link from 'next/link';
 import { 
+  ArrowLeft,
   Star, 
   Calendar, 
   Users, 
@@ -77,7 +79,15 @@ I believe in a personalized approach, tailoring each session to the student's le
   return (
     <div className="min-h-screen bg-[#0F1115] text-gray-200 pb-20">
       
-      <div className="max-w-7xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <Link href="/tutors" className="inline-block mb-6">
+          <Button variant="ghost" className="text-gray-400 hover:text-white hover:bg-gray-800 -ml-4">
+            <ArrowLeft className="w-5 h-5 mr-2" />
+            Back to Tutors
+          </Button>
+        </Link>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
         {/* Main Content Column */}
         <div className="lg:col-span-8 space-y-8">
@@ -315,18 +325,23 @@ I believe in a personalized approach, tailoring each session to the student's le
             <h3 className="font-bold text-white mb-6">Course Offerings</h3>
             <div className="space-y-3">
               {tutor.courses.map((course, idx) => (
-                <div key={idx} className="group flex items-center justify-between bg-[#1E2330] hover:bg-[#252b3b] p-4 rounded-xl border border-gray-800/50 hover:border-gray-700 transition-all cursor-pointer">
+                <Link 
+                  href={`/session/${course.name.toLowerCase().replace(/ /g, '-')}`} 
+                  key={idx} 
+                  className="group flex items-center justify-between bg-[#1E2330] hover:bg-[#252b3b] p-4 rounded-xl border border-gray-800/50 hover:border-gray-700 transition-all cursor-pointer"
+                >
                   <div>
                     <h4 className="font-bold text-white text-sm mb-1">{course.name}</h4>
                     <span className="text-xs text-gray-500">{course.modules} Modules • {course.level}</span>
                   </div>
                   <ChevronRight className="w-4 h-4 text-gray-600 group-hover:text-white transition-colors" />
-                </div>
+                </Link>
               ))}
             </div>
           </div>
 
         </div>
+      </div>
       </div>
     </div>
   );
