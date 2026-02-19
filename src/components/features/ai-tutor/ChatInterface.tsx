@@ -3,35 +3,40 @@
 import { useState, useRef, useEffect } from 'react';
 import { Send, Image as ImageIcon, Plus, History, Bot, X, MessageSquare } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useChat } from '../../../hooks/useChat';
+import { Message } from '../../../hooks/useChat';
 
-export function ChatInterface() {
+interface ChatInterfaceProps {
+  messages: Message[];
+  isLoading: boolean;
+  error: string | null;
+  sendMessage: (content: string) => void;
+}
+
+export function ChatInterface({ messages, isLoading, error, sendMessage }: ChatInterfaceProps) {
   const [showHistory, setShowHistory] = useState(false);
   const [input, setInput] = useState('');
   const chatBoxRef = useRef<HTMLDivElement>(null);
-
-  const { messages, isLoading, error, sendMessage } = useChat();
 
   const historySessions = [
     { id: 1, title: "Quantum Mechanics Intro", date: "Today, 10:23 AM", active: true },
     { id: 2, title: "Calculus: Integration", date: "Yesterday, 2:45 PM", active: false },
     { id: 3, title: "React Hooks Explanation", date: "Mon, 11:30 AM", active: false },
     { id: 4, title: "French Revolution Summary", date: "Last Week", active: false },
-    { id: 5, title: "Python Data Structures", date: "2 weeks ago", active: false }
+    { id: 5, title: "Python Data Structures", date: "2 weeks ago", active: false },
   ];
 
-  // Auto-scroll only the chat box, not the whole page
+  // Auto-scroll only the chat box
   useEffect(() => {
     if (chatBoxRef.current) {
       chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
     }
   }, [messages]);
 
-  const handleSend = async () => {
+  const handleSend = () => {
     if (!input.trim() || isLoading) return;
     const text = input;
     setInput('');
-    await sendMessage(text);
+    sendMessage(text);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -41,7 +46,6 @@ export function ChatInterface() {
     }
   };
 
-  // Parse content for code blocks (```lang\ncode```)
   const parseContent = (content: string) => {
     const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
     const parts: { type: 'text' | 'code'; content: string; language?: string }[] = [];
@@ -80,7 +84,7 @@ export function ChatInterface() {
         </button>
       </div>
 
-      {/* History Panel Overlay */}
+      {/* History Panel */}
       <AnimatePresence>
         {showHistory && (
           <motion.div
@@ -123,17 +127,14 @@ export function ChatInterface() {
         )}
       </AnimatePresence>
 
-      {/* Chat Area — ref is here, scrolls only this box */}
+      {/* Chat Area */}
       <div ref={chatBoxRef} className="flex-1 overflow-y-auto p-6 space-y-8">
-
-        {/* Error message */}
         {error && (
           <div className="text-center text-sm text-red-500 bg-red-50 dark:bg-red-900/20 rounded-xl p-3">
             {error}
           </div>
         )}
 
-        {/* Empty state */}
         {messages.length === 0 && !isLoading && (
           <div className="flex flex-col items-center justify-center h-full text-center gap-3 opacity-50">
             <Bot className="w-10 h-10 text-indigo-400" />
@@ -143,7 +144,6 @@ export function ChatInterface() {
 
         {messages.map((msg) => {
           const parts = parseContent(msg.content);
-
           return (
             <div key={msg.id} className={`flex gap-4 ${msg.role === 'user' ? 'justify-end' : ''}`}>
               {msg.role === 'assistant' && (
@@ -167,8 +167,8 @@ export function ChatInterface() {
                           ))}
                         </div>
                       ) : (
-                        <div key={i} className="bg-[#1e293b] dark:bg-[#0D0F14] rounded-xl border border-gray-700 dark:border-gray-800 overflow-hidden shadow-md">
-                          <div className="flex justify-between items-center px-4 py-2 bg-[#0f172a] dark:bg-[#1A1C24] border-b border-gray-700 dark:border-gray-800">
+                        <div key={i} className="bg-[#1e293b] dark:bg-[#0D0F14] rounded-xl border border-gray-700 overflow-hidden shadow-md">
+                          <div className="flex justify-between items-center px-4 py-2 bg-[#0f172a] dark:bg-[#1A1C24] border-b border-gray-700">
                             <span className="text-xs text-gray-400 font-mono">{part.language}</span>
                             <div className="flex gap-1.5">
                               <div className="w-2.5 h-2.5 rounded-full bg-red-500/40"></div>
@@ -177,9 +177,7 @@ export function ChatInterface() {
                             </div>
                           </div>
                           <div className="p-4 overflow-x-auto">
-                            <pre className="font-mono text-sm text-gray-300">
-                              <code>{part.content}</code>
-                            </pre>
+                            <pre className="font-mono text-sm text-gray-300"><code>{part.content}</code></pre>
                           </div>
                         </div>
                       )
@@ -197,7 +195,6 @@ export function ChatInterface() {
           );
         })}
 
-        {/* Typing indicator */}
         {isLoading && (
           <div className="flex gap-4">
             <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center shrink-0">
@@ -225,7 +222,6 @@ export function ChatInterface() {
           <button className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-800 rounded-xl transition-colors">
             <Plus className="w-5 h-5" />
           </button>
-
           <input
             type="text"
             value={input}
@@ -235,7 +231,6 @@ export function ChatInterface() {
             className="flex-1 bg-transparent text-gray-900 dark:text-gray-200 placeholder-gray-500 focus:outline-none text-sm"
             disabled={isLoading}
           />
-
           <div className="flex items-center gap-2">
             <button className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-800 rounded-xl transition-colors">
               <ImageIcon className="w-5 h-5" />
