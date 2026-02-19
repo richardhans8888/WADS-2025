@@ -1,14 +1,42 @@
+"use client";
+
 import { ChatInterface } from '@/components/features/ai-tutor/ChatInterface';
 import { VoiceMode } from '@/components/features/ai-tutor/VoiceMode';
+import { useChat } from '../../../hooks/useChat';
+import { useVoice } from '../../../hooks/useVoice';
 
 export default function AITutorPage() {
+  // Shared state — both ChatInterface and VoiceMode use the same instance
+  const { messages, isLoading, error, sendMessage } = useChat();
+
+  const { isListening, isSpeaking, isSupported, startListening, stopListening, speak, stopSpeaking } = useVoice({
+    onTranscript: (text) => {
+      // When voice finishes, auto-send to chat
+      sendMessage(text);
+    },
+  });
+
   return (
     <div className="h-[calc(100vh-64px)] w-full bg-gray-50 dark:bg-[#05050A] p-4 lg:p-6 overflow-hidden transition-colors duration-300">
       <div className="h-full max-w-[1800px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 relative z-10">
-        <ChatInterface />
-        <VoiceMode />
+        <ChatInterface
+          messages={messages}
+          isLoading={isLoading}
+          error={error}
+          sendMessage={sendMessage}
+        />
+        <VoiceMode
+          messages={messages}
+          isListening={isListening}
+          isSpeaking={isSpeaking}
+          isSupported={isSupported}
+          startListening={startListening}
+          stopListening={stopListening}
+          speak={speak}
+          stopSpeaking={stopSpeaking}
+        />
       </div>
-      
+
       {/* Ambient Background Glow */}
       <div className="fixed inset-0 pointer-events-none z-0">
         <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-purple-200/40 dark:bg-purple-900/20 blur-[120px] rounded-full mix-blend-multiply dark:mix-blend-screen" />
