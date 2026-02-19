@@ -214,9 +214,9 @@ export default function Dashboard() {
                <h3 className="text-xl font-bold text-white mb-2">Try AI Tutoring</h3>
                <p className="text-gray-400 text-sm mb-6 max-w-xs">Get instant help with homework, concept explanations, and quiz generation 24/7.</p>
                
-               <button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-medium px-6 py-2.5 rounded-full shadow-lg shadow-indigo-500/25 transition-all transform hover:-translate-y-0.5 hover:scale-105 active:scale-95">
+               <Link href="/ai-tutor" className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-medium px-6 py-2.5 rounded-full shadow-lg shadow-indigo-500/25 transition-all transform hover:-translate-y-0.5 hover:scale-105 active:scale-95">
                   Start Free Chat
-               </button>
+               </Link>
             </motion.div>
           </motion.div>
 

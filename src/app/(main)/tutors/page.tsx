@@ -266,7 +266,7 @@ export default function TutorsPage() {
                 </p>
               </div>
               <div className="flex items-center gap-3 mt-6">
-                <Link href="/profile">
+                <Link href="/tutors/sarah-jenkins">
                   <Button className="shadow">View Profile</Button>
                 </Link>
                 <Button variant="ghost" className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10">
