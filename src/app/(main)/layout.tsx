@@ -11,7 +11,7 @@ export default function MainLayout({
 }>) {
   const pathname = usePathname();
   const hideFooter = pathname.startsWith("/session") || pathname.startsWith("/chat") || (pathname.startsWith("/groups/") && pathname !== "/groups");
-  const hideHeader = pathname.startsWith("/session") || (pathname.startsWith("/groups/") && pathname !== "/groups");
+  const hideHeader = false;
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-[#0F172A]">
       {!hideHeader && <Header />}

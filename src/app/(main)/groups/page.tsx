@@ -1,7 +1,7 @@
  "use client";
  
- import Link from "next/link";
- import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
  import { Button } from "@/components/ui/Button";
  import { Users, Search, Plus, ChevronDown, ArrowRight, Clock, FlaskConical, Image, BookOpen, Code } from "lucide-react";
  import {
@@ -10,6 +10,13 @@
    DropdownMenuItem,
    DropdownMenuTrigger,
  } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
  
  type Group = {
    id: string;
@@ -21,6 +28,7 @@
    status: "Active" | "Full" | "Recruiting";
    accent: "blue" | "indigo" | "emerald" | "rose" | "purple";
    desc: string;
+  privacy?: "Public" | "Private";
  };
  
  const allGroups: Group[] = [
@@ -40,19 +48,34 @@
    const [query, setQuery] = useState("");
    const [activeSubject, setActiveSubject] = useState("All Subjects");
    const [activeSort, setActiveSort] = useState("Most Popular");
-   const [joinedIds, setJoinedIds] = useState<string[]>([]);
+  const [joinedIds, setJoinedIds] = useState<string[]>([]);
+  const [customGroups, setCustomGroups] = useState<Group[]>([]);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [formName, setFormName] = useState("");
+  const [formSubject, setFormSubject] = useState("Mathematics");
+  const [formTheme, setFormTheme] = useState<Group["accent"]>("purple");
+  const [formPrivacy, setFormPrivacy] = useState<"Public" | "Private">("Public");
+  const [formDesc, setFormDesc] = useState("");
+  const [formMax, setFormMax] = useState(12);
+  const [formSchedule, setFormSchedule] = useState("TBD");
  
    useEffect(() => {
      if (typeof window === "undefined") return;
      const stored = localStorage.getItem("joinedGroups");
      const name = localStorage.getItem("userName") || "";
+    const storedCustom = localStorage.getItem("customGroups");
      if (stored) {
        try {
          const parsed = JSON.parse(stored) as string[];
          setJoinedIds(parsed);
-         return;
        } catch {}
      }
+    if (storedCustom) {
+      try {
+        const parsed = JSON.parse(storedCustom) as Group[];
+        setCustomGroups(parsed);
+      } catch {}
+    }
      let seed: string[] = [];
      if (name === "Alex Rivera") seed = ["adv-calculus-ii", "quantum-mechanics-101"];
      if (name === "Sarah Jenkins") seed = ["python-beginners"];
@@ -61,7 +84,8 @@
    }, []);
  
    const filtered = useMemo(() => {
-     let list = allGroups.filter((g) =>
+    const source = [...allGroups, ...customGroups];
+    let list = source.filter((g) =>
        (activeSubject === "All Subjects" || g.subject === activeSubject) &&
        (query.trim().length === 0 || g.name.toLowerCase().includes(query.toLowerCase()))
      );
@@ -73,7 +97,7 @@
        list = list;
      }
      return list;
-   }, [activeSubject, activeSort, query]);
+  }, [activeSubject, activeSort, query, customGroups]);
  
    const joined = filtered.filter((g) => joinedIds.includes(g.id));
    const discover = filtered.filter((g) => !joinedIds.includes(g.id));
@@ -121,11 +145,9 @@
                onChange={(e) => setQuery(e.target.value)}
              />
            </div>
-           <Link href="/groups/create">
-             <Button size="sm" className="bg-purple-600 hover:bg-purple-500">
-               <Plus className="w-4 h-4 mr-2" /> Create Group
-             </Button>
-           </Link>
+          <Button size="sm" className="bg-purple-600 hover:bg-purple-500" onClick={() => setCreateOpen(true)}>
+            <Plus className="w-4 h-4 mr-2" /> Create Group
+          </Button>
          </div>
        </header>
  
@@ -148,9 +170,7 @@
  
          <div className="mb-4 flex items-center justify-between">
            <h2 className="text-sm font-semibold text-gray-300">Your Groups</h2>
-           <Link href="/groups/create">
-             <Button size="sm" variant="outline" className="border-gray-700 hover:bg-[#1E2330]">Create Group</Button>
-           </Link>
+          <Button size="sm" variant="outline" className="border-gray-700 hover:bg-[#1E2330]" onClick={() => setCreateOpen(true)}>Create Group</Button>
          </div>
          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
            {joined.length === 0 ? (
@@ -296,20 +316,146 @@
              );
            })}
  
-           <Link
-             href="/groups/create"
-             className="group rounded-2xl border border-dashed border-gray-700 bg-[#151921] flex items-center justify-center p-6 hover:border-gray-600"
-           >
-             <div className="text-center">
-               <div className="mx-auto mb-3 w-10 h-10 rounded-xl bg-[#1E2330] group-hover:bg-[#252b3b] flex items-center justify-center">
-                 <Plus className="w-5 h-5 text-gray-400 group-hover:text-white" />
-               </div>
-               <div className="font-bold">Create a New Group</div>
-               <div className="text-xs text-gray-400 mt-1">Start your own study circle.</div>
-             </div>
-           </Link>
+          <button
+            onClick={() => setCreateOpen(true)}
+            className="group rounded-2xl border border-dashed border-gray-700 bg-[#151921] flex items-center justify-center p-6 hover:border-gray-600"
+          >
+            <div className="text-center">
+              <div className="mx-auto mb-3 w-10 h-10 rounded-xl bg-[#1E2330] group-hover:bg-[#252b3b] flex items-center justify-center">
+                <Plus className="w-5 h-5 text-gray-400 group-hover:text-white" />
+              </div>
+              <div className="font-bold">Create a New Group</div>
+              <div className="text-xs text-gray-400 mt-1">Start your own study circle.</div>
+            </div>
+          </button>
          </div>
        </div>
+      
+      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+        <DialogContent className="sm:max-w-[520px] bg-[#0F1622] text-white border border-white/10">
+          <DialogHeader>
+            <DialogTitle>Create Group</DialogTitle>
+            <DialogDescription className="text-xs text-gray-400">Fill in the details to create your study group.</DialogDescription>
+          </DialogHeader>
+          <div className="mt-2 space-y-4">
+            <div className="space-y-2">
+              <label className="text-xs text-gray-300">Group Name</label>
+              <input
+                value={formName}
+                onChange={(e) => setFormName(e.target.value)}
+                placeholder="e.g., Linear Algebra Study"
+                className="w-full h-10 rounded-lg bg-[#0E141E] border border-white/10 px-3 text-sm"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-xs text-gray-300">Subject</label>
+                <select
+                  value={formSubject}
+                  onChange={(e) => setFormSubject(e.target.value)}
+                  className="w-full h-10 rounded-lg bg-[#0E141E] border border-white/10 px-3 text-sm"
+                >
+                  {subjects.filter((s) => s !== "All Subjects").map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs text-gray-300">Theme</label>
+                <select
+                  value={formTheme}
+                  onChange={(e) => setFormTheme(e.target.value as Group["accent"])}
+                  className="w-full h-10 rounded-lg bg-[#0E141E] border border-white/10 px-3 text-sm"
+                >
+                  <option value="purple">Purple</option>
+                  <option value="blue">Blue</option>
+                  <option value="indigo">Indigo</option>
+                  <option value="emerald">Emerald</option>
+                  <option value="rose">Rose</option>
+                </select>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-xs text-gray-300">Privacy</label>
+                <select
+                  value={formPrivacy}
+                  onChange={(e) => setFormPrivacy(e.target.value as "Public" | "Private")}
+                  className="w-full h-10 rounded-lg bg-[#0E141E] border border-white/10 px-3 text-sm"
+                >
+                  <option value="Public">Public</option>
+                  <option value="Private">Private</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs text-gray-300">Max Members</label>
+                <input
+                  type="number"
+                  min={2}
+                  max={200}
+                  value={formMax}
+                  onChange={(e) => setFormMax(parseInt(e.target.value || "12"))}
+                  className="w-full h-10 rounded-lg bg-[#0E141E] border border-white/10 px-3 text-sm"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs text-gray-300">Schedule</label>
+              <input
+                value={formSchedule}
+                onChange={(e) => setFormSchedule(e.target.value)}
+                placeholder="e.g., Wed, 7PM"
+                className="w-full h-10 rounded-lg bg-[#0E141E] border border-white/10 px-3 text-sm"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs text-gray-300">Description</label>
+              <textarea
+                value={formDesc}
+                onChange={(e) => setFormDesc(e.target.value)}
+                placeholder="Brief description"
+                className="w-full min-h-[80px] rounded-lg bg-[#0E141E] border border-white/10 px-3 py-2 text-sm"
+              />
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button variant="outline" className="border-white/10" onClick={() => setCreateOpen(false)}>Cancel</Button>
+              <Button
+                className="bg-purple-600 hover:bg-purple-500"
+                disabled={!formName.trim()}
+                onClick={() => {
+                  const newGroup: Group = {
+                    id: formName.trim().toLowerCase().replace(/\\s+/g, "-"),
+                    name: formName.trim(),
+                    subject: formSubject,
+                    capacity: 0,
+                    max: formMax,
+                    schedule: formSchedule,
+                    status: "Recruiting",
+                    accent: formTheme,
+                    desc: formDesc || "No description provided.",
+                    privacy: formPrivacy,
+                  };
+                  const next = [...customGroups, newGroup];
+                  setCustomGroups(next);
+                  if (typeof window !== "undefined") {
+                    localStorage.setItem("customGroups", JSON.stringify(next));
+                  }
+                  setCreateOpen(false);
+                  setFormName("");
+                  setFormDesc("");
+                  setFormMax(12);
+                  setFormSchedule("TBD");
+                  setFormSubject("Mathematics");
+                  setFormTheme("purple");
+                  setFormPrivacy("Public");
+                }}
+              >
+                Create
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
      </div>
    );
  }

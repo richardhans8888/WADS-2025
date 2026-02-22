@@ -99,6 +99,8 @@ export default function GroupChatPage() {
   const [showSidebar, setShowSidebar] = useState(true);
   const [showFiles, setShowFiles] = useState(false);
   const files = messages.filter((m) => !!m.attachment);
+  const [groupVoiceJoined, setGroupVoiceJoined] = useState(false);
+  const [groupVoiceMuted, setGroupVoiceMuted] = useState(false);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -335,7 +337,7 @@ export default function GroupChatPage() {
 
       {showSidebar && (
       <div className="w-80 bg-white dark:bg-[#151921] border-l border-gray-200 dark:border-white/5 hidden xl:flex flex-col p-6 overflow-y-auto z-20 shadow-[-5px_0_30px_-10px_rgba(0,0,0,0.1)]">
-        {/* Voice Room Card */}
+        {/* Group Voice (lightweight) */}
         <div className="rounded-3xl bg-gray-900 dark:bg-[#151B28] p-5 border border-gray-800 dark:border-white/5 mb-8 shadow-xl relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
           
@@ -344,11 +346,17 @@ export default function GroupChatPage() {
               <div className="p-2 rounded-lg bg-purple-500/10 text-purple-400">
                 <Volume2 className="w-5 h-5" />
               </div>
-              <span className="font-bold text-white text-sm">Voice Room</span>
+              <span className="font-bold text-white text-sm">Group Voice</span>
             </div>
-            <span className="px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-bold text-emerald-500 tracking-wide animate-pulse">
-              LIVE
-            </span>
+            {groupVoiceJoined ? (
+              <span className="px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-bold text-emerald-500 tracking-wide">
+                CONNECTED
+              </span>
+            ) : (
+              <span className="px-2 py-0.5 rounded-md bg-gray-500/10 border border-gray-500/20 text-[10px] font-bold text-gray-300 tracking-wide">
+                IDLE
+              </span>
+            )}
           </div>
           
           <div className="flex -space-x-3 mb-5 px-2 relative z-10">
@@ -364,12 +372,52 @@ export default function GroupChatPage() {
             </div>
           </div>
 
-          <Link href={`/session/${params.id || 'demo'}`}>
-            <button className="w-full h-10 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold transition shadow-lg shadow-purple-900/20 flex items-center justify-center gap-2 group-hover:shadow-purple-500/20">
-              Join Room
-              <ArrowLeft className="w-3 h-3 rotate-180" />
-            </button>
-          </Link>
+          {!groupVoiceJoined ? (
+            <div className="space-y-3">
+              <button
+                onClick={() => setGroupVoiceJoined(true)}
+                className="w-full h-10 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold transition shadow-lg shadow-purple-900/20 flex items-center justify-center gap-2 group-hover:shadow-purple-500/20"
+              >
+                Join Group Voice
+                <ArrowLeft className="w-3 h-3 rotate-180" />
+              </button>
+              <Link href={`/session/${params.id || 'demo'}`}>
+                <button className="w-full h-10 rounded-xl bg-[#0F1115] border border-white/10 text-white/80 hover:bg-white/5 text-xs font-bold transition flex items-center justify-center gap-2">
+                  Open Study Room Call
+                </button>
+              </Link>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between rounded-xl bg-[#0F1115] border border-white/10 p-3">
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setGroupVoiceMuted((m) => !m)}
+                    className={`w-9 h-9 rounded-full flex items-center justify-center ${groupVoiceMuted ? 'bg-gray-200 dark:bg-white/10 text-gray-700 dark:text-gray-300' : 'bg-purple-600 text-white'}`}
+                    title={groupVoiceMuted ? "Unmute" : "Mute"}
+                  >
+                    {/* Using Volume2 as lightweight mute indicator */}
+                    <Volume2 className="w-4 h-4" />
+                  </button>
+                  <span className="text-xs text-gray-400">{groupVoiceMuted ? 'Muted' : 'Speaking'}</span>
+                </div>
+                <button
+                  onClick={() => {
+                    setGroupVoiceJoined(false);
+                    setGroupVoiceMuted(false);
+                  }}
+                  className="px-3 h-9 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-bold"
+                >
+                  Leave
+                </button>
+              </div>
+              <Link href={`/session/${params.id || 'demo'}`}>
+                <button className="w-full h-10 rounded-xl bg-[#0F1115] border border-white/10 text-white/80 hover:bg-white/5 text-xs font-bold transition flex items-center justify-center gap-2">
+                  Open Study Room Call
+                </button>
+              </Link>
+            </div>
+          )}
         </div>
 
         {/* Online Members */}
