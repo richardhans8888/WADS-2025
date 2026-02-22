@@ -10,10 +10,11 @@ export default function MainLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
-  const hideFooter = pathname.startsWith("/session") || pathname.startsWith("/chat");
+  const hideFooter = pathname.startsWith("/session") || pathname.startsWith("/chat") || (pathname.startsWith("/groups/") && pathname !== "/groups");
+  const hideHeader = pathname.startsWith("/session") || (pathname.startsWith("/groups/") && pathname !== "/groups");
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-[#0F172A]">
-      <Header />
+      {!hideHeader && <Header />}
       <main className="flex-1">
         {children}
       </main>
