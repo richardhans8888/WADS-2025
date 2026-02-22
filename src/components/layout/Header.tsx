@@ -2,7 +2,7 @@
 "use client";
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { User, Bell, Menu, BookOpen, Trophy, LogOut, CreditCard, Users, Plus, Calendar as CalendarIcon } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { ModeToggle } from '@/components/mode-toggle';
@@ -26,6 +26,9 @@ import {
 export function Header() {
   const [name, setName] = useState<string>("Alex Rivera");
   const [email, setEmail] = useState<string>("alex@mit.edu");
+  type NotificationItem = { id: string; title: string; desc?: string; time: string; read?: boolean; href?: string };
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const unreadCount = useMemo(() => notifications.filter(n => !n.read).length, [notifications]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -33,6 +36,21 @@ export function Header() {
     const storedName = localStorage.getItem("userName");
     if (storedEmail) setEmail(storedEmail);
     if (storedName) setName(storedName);
+    const storedNotifs = localStorage.getItem("notifications");
+    if (storedNotifs) {
+      try {
+        const parsed = JSON.parse(storedNotifs) as NotificationItem[];
+        setNotifications(parsed);
+      } catch {}
+    } else {
+      const seed: NotificationItem[] = [
+        { id: "n1", title: "Study Room Starts in 30m", time: "Just now", href: "/forums" },
+        { id: "n2", title: "New Message in Group Chat", time: "5m ago", href: "/chat" },
+        { id: "n3", title: "Payment Receipt Available", time: "1h ago", href: "/purchases", read: true },
+      ];
+      setNotifications(seed);
+      localStorage.setItem("notifications", JSON.stringify(seed));
+    }
   }, []);
 
   function switchTo(nextName: string, nextEmail: string) {
@@ -44,6 +62,17 @@ export function Header() {
       localStorage.setItem("userRole", role);
     }
     window.location.href = "/";
+  }
+
+  function markAllRead() {
+    const updated = notifications.map(n => ({ ...n, read: true }));
+    setNotifications(updated);
+    if (typeof window !== "undefined") localStorage.setItem("notifications", JSON.stringify(updated));
+  }
+
+  function clearNotifications() {
+    setNotifications([]);
+    if (typeof window !== "undefined") localStorage.setItem("notifications", JSON.stringify([]));
   }
 
   return (
@@ -84,9 +113,49 @@ export function Header() {
              <span className="text-xs font-bold text-gray-700 dark:text-white">Lvl 12</span>
           </div>
           
-          <Button variant="ghost" size="icon" className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10">
-            <Bell className="h-5 w-5" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="relative rounded-full p-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10">
+                <Bell className="h-5 w-5" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-1 right-1 inline-flex h-2 w-2 rounded-full bg-red-500" />
+                )}
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-80" align="end" forceMount>
+              <DropdownMenuLabel className="font-medium flex items-center justify-between">
+                <span>Notifications</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">{unreadCount > 0 ? `${unreadCount} unread` : "All caught up"}</span>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <div className="max-h-80 overflow-auto">
+                {notifications.length === 0 ? (
+                  <div className="p-3 text-sm text-gray-500 dark:text-gray-400">No notifications</div>
+                ) : (
+                  notifications.map((n) => (
+                    <DropdownMenuItem key={n.id} asChild>
+                      <Link href={n.href || "#"} className="flex items-start gap-2 px-2 py-2">
+                        <div className={`mt-1 h-2 w-2 rounded-full ${n.read ? "bg-gray-300 dark:bg-gray-600" : "bg-blue-500"}`} />
+                        <div className="flex-1">
+                          <div className="text-sm font-medium">{n.title}</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">{n.time}</div>
+                        </div>
+                      </Link>
+                    </DropdownMenuItem>
+                  ))
+                )}
+              </div>
+              <DropdownMenuSeparator />
+              <div className="flex items-center justify-end gap-2 px-2 pb-2">
+                <button onClick={markAllRead} className="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/20">
+                  Mark all read
+                </button>
+                <button onClick={clearNotifications} className="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/20">
+                  Clear
+                </button>
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           <Dialog>
             <DropdownMenu>
