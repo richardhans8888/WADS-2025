@@ -7,6 +7,7 @@ import { Header } from '@/components/layout/Header';
 import { Button } from '@/components/ui/Button';
 import { BookOpen, Moon } from 'lucide-react';
 import ColorThief from 'colorthief';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
@@ -16,6 +17,9 @@ export default function Home() {
     return false;
   });
   const [themeColor, setThemeColor] = useState('#5A3DFF');
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const forceAuth = typeof window !== 'undefined' && (searchParams.get('add_account') === '1');
 
   useEffect(() => {
     const img = new Image();
@@ -38,9 +42,10 @@ export default function Home() {
   const handleLogin = () => {
     setIsLoggedIn(true);
     localStorage.setItem('isLoggedIn', 'true');
+    router.push('/');
   };
 
-  if (isLoggedIn) {
+  if (isLoggedIn && !forceAuth) {
     return (
       <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-[#0F172A] transition-colors duration-300">
         <Header />

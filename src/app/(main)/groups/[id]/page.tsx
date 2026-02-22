@@ -18,6 +18,13 @@ import {
   ChevronLeft
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -101,6 +108,8 @@ export default function GroupChatPage() {
   const files = messages.filter((m) => !!m.attachment);
   const [groupVoiceJoined, setGroupVoiceJoined] = useState(false);
   const [groupVoiceMuted, setGroupVoiceMuted] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -130,6 +139,13 @@ export default function GroupChatPage() {
       handleSendMessage();
     }
   };
+
+  const filteredMessages = searchQuery.trim()
+    ? messages.filter((m: any) => {
+        const text = (m.content || "") + " " + (m.attachment?.name || "");
+        return text.toLowerCase().includes(searchQuery.toLowerCase());
+      })
+    : messages;
 
   return (
     <div className="flex h-screen w-full bg-white dark:bg-[#0F1115] text-gray-900 dark:text-white overflow-hidden font-sans">
@@ -209,12 +225,76 @@ export default function GroupChatPage() {
               <span className="text-xs font-bold text-orange-600 dark:text-orange-200">{groupInfo.streak} Streak</span>
             </div>
             <div className="h-8 w-[1px] bg-gray-200 dark:bg-white/10 mx-2"></div>
-            <button className="p-2.5 hover:bg-gray-100 dark:hover:bg-white/5 rounded-full transition text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-white">
-              <Search className="w-5 h-5" />
-            </button>
-            <button className="p-2.5 hover:bg-gray-100 dark:hover:bg-white/5 rounded-full transition text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-white">
-              <MoreVertical className="w-5 h-5" />
-            </button>
+            {!searchOpen ? (
+              <button
+                className="p-2.5 hover:bg-gray-100 dark:hover:bg-white/5 rounded-full transition text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-white"
+                onClick={() => setSearchOpen(true)}
+                title="Search"
+              >
+                <Search className="w-5 h-5" />
+              </button>
+            ) : (
+              <div className="flex items-center gap-2 bg-gray-100 dark:bg-[#1E2330] border border-gray-200 dark:border-white/10 rounded-full px-3 py-1.5">
+                <Search className="w-4 h-4 text-gray-500" />
+                <input
+                  autoFocus
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Escape") {
+                      setSearchOpen(false);
+                      setSearchQuery("");
+                    }
+                  }}
+                  placeholder="Search messages"
+                  className="bg-transparent outline-none text-sm text-gray-900 dark:text-gray-200 w-48"
+                />
+                {searchQuery && (
+                  <span className="text-[11px] px-2 py-0.5 rounded bg-gray-200 dark:bg-white/10 text-gray-600 dark:text-gray-300">
+                    {filteredMessages.length}
+                  </span>
+                )}
+                <button
+                  className="p-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-white/10 text-gray-500"
+                  onClick={() => {
+                    setSearchOpen(false);
+                    setSearchQuery("");
+                  }}
+                  title="Close"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  className="p-2.5 hover:bg-gray-100 dark:hover:bg-white/5 rounded-full transition text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-white"
+                  title="More"
+                >
+                  <MoreVertical className="w-5 h-5" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuItem onClick={() => setSearchOpen(true)}>
+                  <Search className="mr-2 h-4 w-4" />
+                  <span>Search Messages</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setShowSidebar((s) => !s)}>
+                  <Users className="mr-2 h-4 w-4" />
+                  <span>Toggle Members</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setShowFiles(true)}>
+                  <FileText className="mr-2 h-4 w-4" />
+                  <span>Open Files</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => router.push("/groups")}>
+                  <ChevronLeft className="mr-2 h-4 w-4" />
+                  <span>Leave Group</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </header>
 
@@ -226,7 +306,7 @@ export default function GroupChatPage() {
             </span>
           </div>
 
-          {messages.map((msg) => {
+          {filteredMessages.map((msg) => {
             if (msg.type === "system") {
               return (
                 <div key={msg.id} className="flex justify-center my-6 opacity-60">

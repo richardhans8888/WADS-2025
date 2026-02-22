@@ -103,8 +103,8 @@ import {
    const discover = filtered.filter((g) => !joinedIds.includes(g.id));
  
    return (
-     <div className="h-[calc(100vh-64px)] bg-[#0F1115] text-white overflow-hidden flex flex-col">
-       <header className="h-20 border-b border-gray-800 px-6 flex items-center justify-between bg-[#151921]">
+    <div className="h-[calc(100vh-64px)] bg-white dark:bg-[#0F1115] text-gray-900 dark:text-white overflow-hidden flex flex-col">
+      <header className="h-20 border-b border-gray-200 dark:border-gray-800 px-6 flex items-center justify-between bg-white dark:bg-[#151921]">
          <div className="flex items-center gap-4">
            <div className="p-2 rounded-lg bg-gradient-to-br from-purple-600 to-indigo-600">
              <Users className="w-5 h-5 text-white" />
@@ -120,9 +120,9 @@ import {
            </div>
          </div>
          <div className="flex items-center gap-3">
-           <DropdownMenu>
+          <DropdownMenu>
              <DropdownMenuTrigger asChild>
-               <button className="px-3 py-2 rounded-full bg-[#1E2330] border border-gray-800 text-gray-300 flex items-center gap-2">
+              <button className="px-3 py-2 rounded-full bg-white dark:bg-[#1E2330] border border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-300 flex items-center gap-2">
                  <span className="text-xs">{activeSort}</span>
                  <ChevronDown className="w-4 h-4" />
                </button>
@@ -135,12 +135,12 @@ import {
                ))}
              </DropdownMenuContent>
            </DropdownMenu>
-           <div className="relative">
+          <div className="relative">
              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
              <input
                type="text"
                placeholder="Search groups..."
-               className="w-64 bg-[#1E2330] border border-gray-800 rounded-full py-2 pl-10 pr-4 text-sm text-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500/40"
+              className="w-64 bg-white dark:bg-[#1E2330] border border-gray-200 dark:border-gray-800 rounded-full py-2 pl-10 pr-4 text-sm text-gray-900 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500/40"
                value={query}
                onChange={(e) => setQuery(e.target.value)}
              />
@@ -153,15 +153,15 @@ import {
  
        <div className="flex-1 overflow-y-auto p-6">
          <div className="flex flex-wrap items-center gap-2 mb-6">
-           {subjects.map((s) => (
+          {subjects.map((s) => (
              <button
                key={s}
                onClick={() => setActiveSubject(s)}
-               className={`px-3 py-1.5 rounded-full text-xs border transition ${
-                 activeSubject === s
-                   ? "bg-[#1E2330] border-purple-500/40 text-white"
-                   : "bg-[#151921] border-gray-800 text-gray-300 hover:bg-[#1E2330]"
-               }`}
+              className={`px-3 py-1.5 rounded-full text-xs border transition ${
+                activeSubject === s
+                  ? "bg-gray-100 dark:bg-[#1E2330] border-purple-500/40 text-gray-900 dark:text-white"
+                  : "bg-white dark:bg-[#151921] border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#1E2330]"
+              }`}
              >
                {s}
              </button>
@@ -173,8 +173,8 @@ import {
           <Button size="sm" variant="outline" className="border-gray-700 hover:bg-[#1E2330]" onClick={() => setCreateOpen(true)}>Create Group</Button>
          </div>
          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-           {joined.length === 0 ? (
-             <div className="rounded-2xl border border-dashed border-gray-700 bg-[#151921] p-6 text-center">
+          {joined.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-gray-300 dark:border-gray-700 bg-white dark:bg-[#151921] p-6 text-center">
                <div className="font-bold mb-1">No groups yet</div>
                <div className="text-xs text-gray-400 mb-3">Join a group below to get started.</div>
                <Link href="/groups">
@@ -197,8 +197,8 @@ import {
                  if (g.subject === "Mathematics") return Image;
                  return Image;
                })();
-               return (
-                 <div key={g.id} className="group rounded-2xl overflow-hidden bg-[#0E141E] border border-[#1E2A3A]">
+              return (
+                <div key={g.id} className="group rounded-2xl overflow-hidden bg-white dark:bg-[#0E141E] border border-gray-200 dark:border-[#1E2A3A]">
                    <div className={`relative h-24 bg-gradient-to-br ${accentClass}`}>
                      <div className="absolute inset-0 opacity-25 bg-[radial-gradient(circle_at_20%_20%,#ffffff33_1px,transparent_1px)] [background-size:20px_20px]" />
                      <div className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-xl bg-white/15 backdrop-blur-sm border border-white/30 flex items-center justify-center">
@@ -210,13 +210,13 @@ import {
                        </div>
                      )}
                    </div>
-                   <div className="p-5 bg-[#0F1622]">
-                     <div className="text-[11px] font-bold inline-block px-2 py-1 rounded-full bg-[#111A29] border border-[#223247] text-gray-300 mb-2">
+                  <div className="p-5 bg-gray-50 dark:bg-[#0F1622]">
+                    <div className="text-[11px] font-bold inline-block px-2 py-1 rounded-full bg-gray-100 dark:bg-[#111A29] border border-gray-200 dark:border-[#223247] text-gray-600 dark:text-gray-300 mb-2">
                        {g.subject.toUpperCase()}
                      </div>
                      <div className="mb-1">
-                       <h3 className="font-bold text-white">{g.name}</h3>
-                       <p className="text-xs text-gray-400">{g.desc}</p>
+                      <h3 className="font-bold text-gray-900 dark:text-white">{g.name}</h3>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">{g.desc}</p>
                      </div>
                      <div className="mt-3 flex items-center justify-between text-xs text-gray-400">
                        <div className="flex items-center gap-2">
@@ -231,7 +231,7 @@ import {
                        </div>
                      </div>
                    </div>
-                   <div className="px-5 pb-5 bg-[#0F1622]">
+                  <div className="px-5 pb-5 bg-gray-50 dark:bg-[#0F1622]">
                      <Link href={`/groups/${g.id}`}>
                        <button className="w-full h-10 rounded-lg border border-blue-600 text-blue-400 bg-transparent hover:bg-blue-600/10 flex items-center justify-center font-semibold">
                          Open Group <ArrowRight className="w-4 h-4 ml-2" />
@@ -256,7 +256,7 @@ import {
                g.accent === "emerald" ? "from-emerald-600 to-emerald-500" :
                g.accent === "rose" ? "from-rose-500 to-rose-400" :
                "from-purple-600 to-purple-500";
-             const isFull = g.status === "Full";
+            const isFull = g.status === "Full";
              const isActive = g.status === "Active";
              const SubjectIcon = (() => {
                if (g.subject === "Science") return FlaskConical;
@@ -265,8 +265,8 @@ import {
                if (g.subject === "Mathematics") return Image;
                return Image;
              })();
-             return (
-               <div key={g.id} className="group rounded-2xl overflow-hidden bg-[#0E141E] border border-[#1E2A3A]">
+            return (
+              <div key={g.id} className="group rounded-2xl overflow-hidden bg-white dark:bg-[#0E141E] border border-gray-200 dark:border-[#1E2A3A]">
                  <div className={`relative h-24 bg-gradient-to-br ${accentClass}`}>
                    <div className="absolute inset-0 opacity-25 bg-[radial-gradient(circle_at_20%_20%,#ffffff33_1px,transparent_1px)] [background-size:20px_20px]" />
                    <div className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-xl bg-white/15 backdrop-blur-sm border border-white/30 flex items-center justify-center">
@@ -278,13 +278,13 @@ import {
                      </div>
                    )}
                  </div>
-                 <div className="p-5 bg-[#0F1622]">
-                   <div className="text-[11px] font-bold inline-block px-2 py-1 rounded-full bg-[#111A29] border border-[#223247] text-gray-300 mb-2">
+                <div className="p-5 bg-gray-50 dark:bg-[#0F1622]">
+                  <div className="text-[11px] font-bold inline-block px-2 py-1 rounded-full bg-gray-100 dark:bg-[#111A29] border border-gray-200 dark:border-[#223247] text-gray-600 dark:text-gray-300 mb-2">
                      {g.subject.toUpperCase()}
                    </div>
                    <div className="mb-1">
-                     <h3 className="font-bold text-white">{g.name}</h3>
-                     <p className="text-xs text-gray-400">{g.desc}</p>
+                    <h3 className="font-bold text-gray-900 dark:text-white">{g.name}</h3>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">{g.desc}</p>
                    </div>
                    <div className="mt-3 flex items-center justify-between text-xs text-gray-400">
                      <div className="flex items-center gap-2">
@@ -299,7 +299,7 @@ import {
                      </div>
                    </div>
                  </div>
-                 <div className="px-5 pb-5 bg-[#0F1622]">
+                <div className="px-5 pb-5 bg-gray-50 dark:bg-[#0F1622]">
                    {isFull ? (
                      <button className="w-full h-10 rounded-lg border border-[#264777] text-gray-500 bg-transparent cursor-not-allowed">
                        Group Full
@@ -318,11 +318,11 @@ import {
  
           <button
             onClick={() => setCreateOpen(true)}
-            className="group rounded-2xl border border-dashed border-gray-700 bg-[#151921] flex items-center justify-center p-6 hover:border-gray-600"
+            className="group rounded-2xl border border-dashed border-gray-300 dark:border-gray-700 bg-white dark:bg-[#151921] flex items-center justify-center p-6 hover:border-gray-400 dark:hover:border-gray-600"
           >
             <div className="text-center">
-              <div className="mx-auto mb-3 w-10 h-10 rounded-xl bg-[#1E2330] group-hover:bg-[#252b3b] flex items-center justify-center">
-                <Plus className="w-5 h-5 text-gray-400 group-hover:text-white" />
+              <div className="mx-auto mb-3 w-10 h-10 rounded-xl bg-gray-100 dark:bg-[#1E2330] group-hover:bg-gray-200 dark:group-hover:bg-[#252b3b] flex items-center justify-center">
+                <Plus className="w-5 h-5 text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-white" />
               </div>
               <div className="font-bold">Create a New Group</div>
               <div className="text-xs text-gray-400 mt-1">Start your own study circle.</div>

@@ -270,7 +270,7 @@ export function Header() {
                 <Button 
                   variant="outline" 
                   className="w-full border-dashed border-2 border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600 text-gray-600 dark:text-gray-300"
-                  onClick={() => { window.location.href = '/auth'; }}
+                  onClick={() => { window.location.href = '/?add_account=1'; }}
                 >
                   <Plus className="mr-2 h-4 w-4" />
                   Add New Account
