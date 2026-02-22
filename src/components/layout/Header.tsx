@@ -97,7 +97,10 @@ export function Header() {
               Tutors
             </Link>
             <Link href="/forums" className="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white transition-colors">
-              Study Groups
+              Study Rooms
+            </Link>
+            <Link href="/groups" className="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white transition-colors">
+              Study Group
             </Link>
             <Link href="/ai-tutor" className="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white transition-colors">
               Learn with AI
