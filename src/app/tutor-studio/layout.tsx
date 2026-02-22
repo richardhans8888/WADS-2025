@@ -1,15 +1,15 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { 
   LayoutDashboard, 
   Users, 
   BookOpen, 
   DollarSign, 
   Calendar, 
-  Sparkles, 
   LogOut,
-  Settings,
   Home
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -29,6 +29,26 @@ export default function TutorStudioLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const [email, setEmail] = useState<string | null>(null);
+  const [isTutor, setIsTutor] = useState<boolean>(false);
+  const [gateOpen, setGateOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    try {
+      const e = typeof window !== "undefined" ? localStorage.getItem("userEmail") : null;
+      const role = typeof window !== "undefined" ? localStorage.getItem("userRole") : null;
+      setEmail(e);
+      let tutor = role === "tutor";
+      if (!role && e) {
+        tutor = e === "alex@mit.edu";
+      }
+      setIsTutor(!!tutor);
+      setGateOpen(!tutor);
+    } catch {
+      setIsTutor(false);
+      setGateOpen(true);
+    }
+  }, []);
 
   return (
     <div className="flex h-screen bg-gray-50 text-gray-900 dark:bg-[#0F1115] dark:text-white overflow-hidden">
@@ -59,11 +79,18 @@ export default function TutorStudioLayout({
                   <item.icon className={`w-5 h-5 ${isActive ? "text-teal-600 dark:text-teal-400" : "text-gray-500"}`} />
                   {item.name}
                 </div>
-                {item.count && (
-                  <span className="bg-teal-100 text-teal-700 dark:bg-teal-500/20 dark:text-teal-400 text-xs font-bold px-2 py-0.5 rounded-full">
-                    {item.count}
-                  </span>
-                )}
+                <div className="flex items-center gap-2">
+                  {item.count && (
+                    <span className="bg-teal-100 text-teal-700 dark:bg-teal-500/20 dark:text-teal-400 text-xs font-bold px-2 py-0.5 rounded-full">
+                      {item.count}
+                    </span>
+                  )}
+                  {!isTutor && item.name !== "Dashboard" && (
+                    <span className="text-[10px] bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full border border-amber-500/30">
+                      Register
+                    </span>
+                  )}
+                </div>
               </Link>
             );
           })}
@@ -90,6 +117,32 @@ export default function TutorStudioLayout({
           {children}
         </div>
       </main>
+
+      <Dialog
+        open={gateOpen}
+        onOpenChange={(o) => setGateOpen(!isTutor ? true : o)}
+      >
+        <DialogContent className="bg-white dark:bg-[#0F1117] border border-gray-200 dark:border-gray-800">
+          <DialogHeader>
+            <DialogTitle className="text-gray-900 dark:text-white">
+              You’re Not a Registered Tutor
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="text-sm text-gray-600 dark:text-gray-400">
+              Please register to access Tutor Studio{email ? ` (${email})` : ""}.
+            </div>
+            <div className="flex justify-end gap-2">
+              <Link href="/">
+                <Button variant="outline">Go Back</Button>
+              </Link>
+              <Link href="/tutor-studio/register">
+                <Button>Register as Tutor</Button>
+              </Link>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

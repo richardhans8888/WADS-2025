@@ -2,7 +2,8 @@
 "use client";
 
 import Link from 'next/link';
-import { User, Bell, Menu, BookOpen, Trophy, LogOut, CreditCard, Settings, Users, ChevronDown, Plus, Calendar as CalendarIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { User, Bell, Menu, BookOpen, Trophy, LogOut, CreditCard, Users, Plus, Calendar as CalendarIcon } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { ModeToggle } from '@/components/mode-toggle';
 import {
@@ -23,6 +24,28 @@ import {
 } from "@/components/ui/dialog";
 
 export function Header() {
+  const [name, setName] = useState<string>("Alex Rivera");
+  const [email, setEmail] = useState<string>("alex@mit.edu");
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const storedEmail = localStorage.getItem("userEmail");
+    const storedName = localStorage.getItem("userName");
+    if (storedEmail) setEmail(storedEmail);
+    if (storedName) setName(storedName);
+  }, []);
+
+  function switchTo(nextName: string, nextEmail: string) {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("userEmail", nextEmail);
+      localStorage.setItem("userName", nextName);
+      const role = nextEmail === "alex@mit.edu" ? "tutor" : "student";
+      localStorage.setItem("userRole", role);
+    }
+    window.location.href = "/";
+  }
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[#0F172A] text-gray-900 dark:text-white transition-colors duration-300">
       <div className="container mx-auto flex h-16 items-center justify-between px-6 md:px-12">
@@ -79,8 +102,8 @@ export function Header() {
               <DropdownMenuContent className="w-56" align="end" forceMount>
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">Alex Rivera</p>
-                    <p className="text-xs leading-none text-muted-foreground">alex@mit.edu</p>
+                    <p className="text-sm font-medium leading-none">{name}</p>
+                    <p className="text-xs leading-none text-muted-foreground">{email}</p>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
@@ -132,7 +155,7 @@ export function Header() {
               <div className="grid gap-4 py-4">
                 <div 
                   className="flex items-center justify-between p-3 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 cursor-pointer"
-                  onClick={() => { window.location.href = '/tutor-studio'; }}
+                  onClick={() => switchTo("Alex Rivera", "alex@mit.edu")}
                 >
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 p-[2px]">
@@ -150,7 +173,7 @@ export function Header() {
 
                 <div 
                   className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-white/5 cursor-pointer transition-colors"
-                  onClick={() => { window.location.href = '/tutor-studio/register'; }}
+                  onClick={() => switchTo("Sarah Jenkins", "sarah.j@gmail.com")}
                 >
                    <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center">
                       <User className="h-5 w-5 text-gray-500 dark:text-gray-400" />

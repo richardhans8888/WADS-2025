@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { 
   Mic, 
   MicOff,
@@ -22,6 +22,28 @@ export default function SessionPage() {
     if (initialPanel === 'whiteboard') return 'whiteboard';
     return 'none';
   });
+  const [sharingStream, setSharingStream] = useState<MediaStream | null>(null);
+  const shareVideoRef = useRef<HTMLVideoElement | null>(null);
+
+  useEffect(() => {
+    if (shareVideoRef.current && sharingStream) {
+      // @ts-ignore
+      shareVideoRef.current.srcObject = sharingStream;
+      shareVideoRef.current.play().catch(() => {});
+    }
+  }, [sharingStream]);
+
+  async function startShare() {
+    try {
+      const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
+      setSharingStream(stream);
+    } catch {}
+  }
+
+  function stopShare() {
+    sharingStream?.getTracks().forEach(t => t.stop());
+    setSharingStream(null);
+  }
   const participants = [
     { id: 1, name: "You", avatar: "You", angle: -140 },
     { id: 2, name: "Sarah J.", avatar: "SJ", center: true },
@@ -83,6 +105,13 @@ export default function SessionPage() {
             >
               {isMicOn ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
             </button>
+            <button
+              onClick={sharingStream ? stopShare : startShare}
+              className={`w-10 h-10 rounded-full flex items-center justify-center ${sharingStream ? 'bg-emerald-600 text-white' : 'bg-white/10 text-gray-300'}`}
+              aria-label="Share Screen"
+            >
+              <Monitor className="w-5 h-5" />
+            </button>
             <button className="w-10 h-10 rounded-full bg-white/10 text-gray-300 flex items-center justify-center">
               <Smile className="w-5 h-5" />
             </button>
@@ -105,6 +134,15 @@ export default function SessionPage() {
           </div>
         </div>
 
+        {sharingStream && (
+          <div className="fixed top-20 left-10 w-[320px] h-[200px] bg-black/60 rounded-xl border border-white/10 overflow-hidden shadow-2xl">
+            <video ref={shareVideoRef} className="w-full h-full object-cover" muted />
+            <div className="absolute top-2 left-2 text-[11px] px-2 py-1 rounded bg-emerald-600 text-white font-bold">Sharing</div>
+            <button onClick={stopShare} className="absolute top-2 right-2 text-xs bg-white/10 hover:bg-white/20 border border-white/10 rounded px-2 py-1">
+              Stop
+            </button>
+          </div>
+        )}
         <div className="fixed bottom-10 right-10 w-[340px] bg-[#0B1220] rounded-2xl border border-white/10 shadow-xl">
           <div className="p-4 border-b border-white/10 flex items-center justify-between">
             <div className="text-sm font-semibold">Personal Notes</div>
