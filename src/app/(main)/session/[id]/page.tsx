@@ -185,7 +185,7 @@ export default function SessionPage() {
             <button
               onClick={() => {
                 stopShare();
-                router.push(`/groups/${params.id}`);
+                router.push(`/forums`);
               }}
               className="px-4 h-12 rounded-full bg-red-600 hover:bg-red-500 flex items-center justify-center text-white font-semibold"
             >
