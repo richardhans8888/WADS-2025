@@ -2,6 +2,8 @@
 "use client";
 
 import Link from 'next/link';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { ArrowRight, MessageSquare, TrendingUp, BookOpen, Star, Flame, Trophy, User, Search, Play, Filter, Check, ChevronDown, ChevronLeft, ChevronRight, Bot, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -76,6 +78,8 @@ const item = {
 };
 
 export default function Dashboard() {
+  const [query, setQuery] = useState("");
+  const router = useRouter();
   return (
     <div className="min-h-screen bg-white dark:bg-[#0F172A] text-gray-900 dark:text-white font-sans transition-colors duration-300">
       
@@ -109,9 +113,17 @@ export default function Dashboard() {
               type="text" 
               className="w-full bg-gray-100 dark:bg-[#1E293B] border border-gray-200 dark:border-gray-700 rounded-full py-4 pl-12 pr-40 text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-500 transition-all shadow-sm hover:shadow-md"
               placeholder="Search by subject, semester material (e.g., 'Calculus II', 'Bio 101'), or tutor name"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
             />
             <div className="absolute inset-y-0 right-2 flex items-center">
-              <button className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-full transition-all hover:scale-105 active:scale-95">
+              <button 
+                className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-full transition-all hover:scale-105 active:scale-95"
+                onClick={() => {
+                  const q = query.trim();
+                  router.push(q ? `/research?q=${encodeURIComponent(q)}` : '/research');
+                }}
+              >
                 Advanced Filters
               </button>
             </div>

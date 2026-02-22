@@ -326,7 +326,7 @@ I believe in a personalized approach, tailoring each session to the student's le
             <div className="space-y-3">
               {tutor.courses.map((course, idx) => (
                 <Link 
-                  href={`/session/${course.name.toLowerCase().replace(/ /g, '-')}`} 
+                  href={`/modules/${course.name.toLowerCase().replace(/ /g, '-')}`} 
                   key={idx} 
                   className="group flex items-center justify-between bg-[#1E2330] hover:bg-[#252b3b] p-4 rounded-xl border border-gray-800/50 hover:border-gray-700 transition-all cursor-pointer"
                 >
@@ -346,4 +346,3 @@ I believe in a personalized approach, tailoring each session to the student's le
     </div>
   );
 }
-

@@ -110,9 +110,23 @@ const getMockEvents = (baseDate: Date) => {
   ];
 };
 
+type EventItem = {
+  id: number;
+  title: string;
+  time: string;
+  duration: string;
+  date: Date;
+  color: string;
+};
+
 export default function SchedulePage() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [view, setView] = useState<"month" | "week" | "day">("month");
+  const [selectedDay, setSelectedDay] = useState<Date | null>(null);
+  const [draftTitle, setDraftTitle] = useState("");
+  const [draftTime, setDraftTime] = useState("10:00");
+  const [draftColor, setDraftColor] = useState<"teal" | "purple" | "orange" | "blue" | "green">("teal");
+  const [userEvents, setUserEvents] = useState<EventItem[]>([]);
 
   // Navigation Logic
   const next = () => {
@@ -150,7 +164,7 @@ export default function SchedulePage() {
   }
 
   const weekDays = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
-  const events = getMockEvents(currentDate);
+  const events = [...getMockEvents(currentDate), ...userEvents];
 
   // Today's stats
   const today = new Date();
@@ -239,6 +253,10 @@ export default function SchedulePage() {
                   ${view === "month" && !isCurrentMonth ? "bg-[#0F1115]/20 border-transparent opacity-50" : "bg-[#0F1115]/50 border-gray-800/50"}
                   ${isToday ? "ring-1 ring-teal-500/50 bg-teal-500/5" : "hover:border-gray-700"}
                 `}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedDay(day);
+                }}
               >
                 {/* Date Header */}
                 <div className="flex justify-between items-start mb-2">
@@ -298,6 +316,88 @@ export default function SchedulePage() {
                     </div>
                   )}
                 </div>
+
+                {selectedDay && isSameDay(selectedDay, day) && (
+                  <div className="absolute top-10 right-3 z-20 w-60 bg-[#0F1115] border border-gray-800 rounded-xl shadow-xl p-3"
+                       onClick={(e) => e.stopPropagation()}>
+                    <div className="text-xs font-semibold text-gray-400 mb-2">
+                      New Event • {format(selectedDay, "MMM d")}
+                    </div>
+                    <div className="space-y-2">
+                      <input
+                        className="w-full bg-[#15181E] border border-gray-800 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+                        placeholder="Title"
+                        value={draftTitle}
+                        onChange={(e) => setDraftTitle(e.target.value)}
+                      />
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-400">Time</span>
+                        <input
+                          type="time"
+                          className="bg-[#15181E] border border-gray-800 rounded-lg px-2 py-1 text-sm text-white"
+                          value={draftTime}
+                          onChange={(e) => setDraftTime(e.target.value)}
+                        />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-400">Color</span>
+                        {[
+                          { key: "teal", cls: "bg-teal-500" },
+                          { key: "purple", cls: "bg-purple-500" },
+                          { key: "orange", cls: "bg-orange-500" },
+                          { key: "blue", cls: "bg-blue-500" },
+                          { key: "green", cls: "bg-green-500" },
+                        ].map(c => (
+                          <button
+                            key={c.key}
+                            className={`w-5 h-5 rounded ${c.cls} ${draftColor === c.key ? "ring-2 ring-white/50" : ""}`}
+                            onClick={() => setDraftColor(c.key as any)}
+                          />
+                        ))}
+                      </div>
+                      <div className="flex items-center justify-end gap-2 pt-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedDay(null);
+                            setDraftTitle("");
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={() => {
+                            if (!selectedDay) return;
+                            const colorMap = {
+                              teal: "bg-teal-500/20 text-teal-300 border-teal-500/30",
+                              purple: "bg-purple-500/20 text-purple-300 border-purple-500/30",
+                              orange: "bg-orange-500/20 text-orange-300 border-orange-500/30",
+                              blue: "bg-blue-500/20 text-blue-300 border-blue-500/30",
+                              green: "bg-green-500/20 text-green-300 border-green-500/30",
+                            } as const;
+                            setUserEvents(prev => [
+                              ...prev,
+                              {
+                                id: Date.now(),
+                                title: draftTitle || "Untitled",
+                                time: format(selectedDay, "h:mm aa"),
+                                duration: "1h",
+                                date: selectedDay,
+                                color: colorMap[draftColor],
+                              },
+                            ]);
+                            setSelectedDay(null);
+                            setDraftTitle("");
+                          }}
+                        >
+                          Save
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}

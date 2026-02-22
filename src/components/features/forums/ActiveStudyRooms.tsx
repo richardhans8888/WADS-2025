@@ -4,6 +4,13 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Mic, Clock, Calendar, ArrowRight, Video, Volume2, Plus, Search } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import Link from 'next/link';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle 
+} from '@/components/ui/dialog';
 
 const rooms = [
   {
@@ -148,6 +155,9 @@ const categories = ["All Rooms", "Mathematics", "Computer Science", "Design", "B
 export function ActiveStudyRooms() {
   const [activeCategory, setActiveCategory] = useState("All Rooms");
   const [searchQuery, setSearchQuery] = useState("");
+  const [joinOpen, setJoinOpen] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState<{ id: number; title: string } | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
 
   const filteredRooms = rooms.filter(room => {
     // Filter by category
@@ -311,6 +321,15 @@ export function ActiveStudyRooms() {
                       ? "bg-gray-800 hover:bg-gray-700 text-white border border-gray-700 h-8 text-xs" 
                       : "bg-blue-600 hover:bg-blue-500 text-white h-8 text-xs shadow-lg shadow-blue-900/20"
                    }
+                  onClick={() => {
+                    if (room.status === 'Scheduled') {
+                      setToast('You will be reminded before this room starts.');
+                      setTimeout(() => setToast(null), 2500);
+                      return;
+                    }
+                    setSelectedRoom({ id: room.id, title: room.title });
+                    setJoinOpen(true);
+                  }}
                 >
                   {room.status === 'Scheduled' ? 'Remind Me' : 'Join Room'}
                 </Button>
@@ -320,6 +339,57 @@ export function ActiveStudyRooms() {
         ))}
         </AnimatePresence>
       </div>
+
+      {toast && (
+        <div className="fixed bottom-6 right-6 bg-black/80 text-white px-4 py-3 rounded-xl border border-white/10 shadow-xl">
+          {toast}
+        </div>
+      )}
+
+      <Dialog open={joinOpen} onOpenChange={setJoinOpen}>
+        <DialogContent className="bg-[#0F172A] border-gray-800 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-lg">
+              {selectedRoom ? `Join ${selectedRoom.title}` : 'Join Room'}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="mt-2 text-sm text-gray-300">
+            Choose how you want to join this study room.
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
+            <Link 
+              href={selectedRoom ? `/study/${selectedRoom.id}` : '#'} 
+              onClick={() => setJoinOpen(false)}
+              className="block"
+            >
+              <div className="h-full p-4 rounded-xl border border-gray-700 hover:border-blue-500/50 bg-[#111827] hover:bg-[#0B1220] transition-colors">
+                <div className="flex items-center gap-3 mb-1">
+                  <Video className="w-5 h-5 text-blue-400" />
+                  <div className="font-semibold">Join Chat</div>
+                </div>
+                <p className="text-xs text-gray-400">
+                  Opens the collaborative board with group chat.
+                </p>
+              </div>
+            </Link>
+            <Link 
+              href={selectedRoom ? `/session/${selectedRoom.id}` : '#'} 
+              onClick={() => setJoinOpen(false)}
+              className="block"
+            >
+              <div className="h-full p-4 rounded-xl border border-gray-700 hover:border-blue-500/50 bg-[#111827] hover:bg-[#0B1220] transition-colors">
+                <div className="flex items-center gap-3 mb-1">
+                  <Mic className="w-5 h-5 text-emerald-400" />
+                  <div className="font-semibold">Join Voice</div>
+                </div>
+                <p className="text-xs text-gray-400">
+                  Join the call. Chat and whiteboard available inside.
+                </p>
+              </div>
+            </Link>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

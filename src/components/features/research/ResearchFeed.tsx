@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Filter, Search, Clock, ArrowRight, BookOpen, GraduationCap, Building2, User, ChevronDown, Check } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
+import { useSearchParams } from 'next/navigation';
 
 // Types for our articles
 type ArticleSource = 'University' | 'Professional' | 'Tutor';
@@ -366,6 +367,8 @@ function FilterDropdown({ label, value, options, onChange }: FilterDropdownProps
 export function ResearchFeed() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [activeSource, setActiveSource] = useState("Any");
+  const searchParams = useSearchParams();
+  const query = (searchParams.get('q') || '').toLowerCase().trim();
 
   const categories = ["All", "Neuroscience", "Computer Science", "Biology", "Physics", "Humanities", "Mathematics", "Business", "Psychology"];
   const sources = ["Any", "University", "Professional", "Tutor"];
@@ -373,7 +376,9 @@ export function ResearchFeed() {
   const filteredArticles = articles.filter(article => {
     const categoryMatch = activeCategory === "All" || article.category === activeCategory;
     const sourceMatch = activeSource === "Any" || article.source.type === activeSource;
-    return categoryMatch && sourceMatch;
+    const text = `${article.title} ${article.description} ${article.tags.join(' ')}`.toLowerCase();
+    const queryMatch = !query || text.includes(query);
+    return categoryMatch && sourceMatch && queryMatch;
   });
 
   return (
@@ -520,9 +525,11 @@ export function ResearchFeed() {
       </div>
 
       <div className="flex justify-center mt-12">
-        <Button variant="outline" size="lg" className="px-8">
-          Browse All Articles
-        </Button>
+        <Link href="/research">
+          <Button variant="outline" size="lg" className="px-8">
+            Browse All Articles
+          </Button>
+        </Link>
       </div>
     </div>
   );

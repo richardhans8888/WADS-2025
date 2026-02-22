@@ -2,7 +2,7 @@
 "use client";
 
 import Link from 'next/link';
-import { User, Bell, Menu, BookOpen, Trophy, LogOut, CreditCard, Settings, Users, ChevronDown, Plus } from 'lucide-react';
+import { User, Bell, Menu, BookOpen, Trophy, LogOut, CreditCard, Settings, Users, ChevronDown, Plus, Calendar as CalendarIcon } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { ModeToggle } from '@/components/mode-toggle';
 import {
@@ -96,6 +96,12 @@ export function Header() {
                     <span>Switch Account</span>
                   </DropdownMenuItem>
                 </DialogTrigger>
+                <DropdownMenuItem asChild>
+                  <Link href="/schedule" className="cursor-pointer">
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    <span>My Schedule</span>
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem className="text-red-600 dark:text-red-400 cursor-pointer" onClick={() => window.location.href = '/'}>
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Sign Out</span>
@@ -124,7 +130,10 @@ export function Header() {
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
-                <div className="flex items-center justify-between p-3 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 cursor-default">
+                <div 
+                  className="flex items-center justify-between p-3 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 cursor-pointer"
+                  onClick={() => { window.location.href = '/tutor-studio'; }}
+                >
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 p-[2px]">
                        <div className="h-full w-full rounded-full bg-white dark:bg-[#0F172A] flex items-center justify-center overflow-hidden">
@@ -139,7 +148,10 @@ export function Header() {
                   <div className="h-2 w-2 rounded-full bg-green-500"></div>
                 </div>
 
-                <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-white/5 cursor-pointer transition-colors">
+                <div 
+                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-white/5 cursor-pointer transition-colors"
+                  onClick={() => { window.location.href = '/tutor-studio/register'; }}
+                >
                    <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center">
                       <User className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                    </div>
@@ -160,7 +172,11 @@ export function Header() {
                   </div>
                 </div>
 
-                <Button variant="outline" className="w-full border-dashed border-2 border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600 text-gray-600 dark:text-gray-300">
+                <Button 
+                  variant="outline" 
+                  className="w-full border-dashed border-2 border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600 text-gray-600 dark:text-gray-300"
+                  onClick={() => { window.location.href = '/auth'; }}
+                >
                   <Plus className="mr-2 h-4 w-4" />
                   Add New Account
                 </Button>
