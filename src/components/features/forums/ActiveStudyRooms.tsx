@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, Mic, Clock, Calendar, ArrowRight, Video, Volume2, Plus, Search } from 'lucide-react';
+import { Users, Mic, Clock, Calendar, Volume2, Plus, Search } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
 import { 
@@ -354,24 +354,9 @@ export function ActiveStudyRooms() {
             </DialogTitle>
           </DialogHeader>
           <div className="mt-2 text-sm text-gray-300">
-            Choose how you want to join this study room.
+            Join this study room.
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
-            <Link 
-              href={selectedRoom ? `/study/${selectedRoom.id}` : '#'} 
-              onClick={() => setJoinOpen(false)}
-              className="block"
-            >
-              <div className="h-full p-4 rounded-xl border border-gray-700 hover:border-blue-500/50 bg-[#111827] hover:bg-[#0B1220] transition-colors">
-                <div className="flex items-center gap-3 mb-1">
-                  <Video className="w-5 h-5 text-blue-400" />
-                  <div className="font-semibold">Join Chat</div>
-                </div>
-                <p className="text-xs text-gray-400">
-                  Opens the collaborative board with group chat.
-                </p>
-              </div>
-            </Link>
+          <div className="grid grid-cols-1 gap-3 mt-4">
             <Link 
               href={selectedRoom ? `/session/${selectedRoom.id}` : '#'} 
               onClick={() => setJoinOpen(false)}

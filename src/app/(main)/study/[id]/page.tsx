@@ -14,7 +14,7 @@
    ArrowLeft 
  } from "lucide-react";
  
- export default function StudyRoomPage() {
+export default function StudyRoomPage({ params }: { params: { id: string } }) {
    return (
      <div className="h-[calc(100vh-64px)] bg-[#0F1115] text-white overflow-hidden flex flex-col">
        <header className="h-16 border-b border-gray-800 px-6 flex items-center justify-between bg-[#151921]">
@@ -34,10 +34,15 @@
              </div>
            </div>
          </div>
-         <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2">
            <Button size="sm" className="bg-blue-600 hover:bg-blue-500">
              <Share2 className="w-4 h-4 mr-2" /> Share Screen
            </Button>
+          <Link href={`/session/${params.id}`}>
+            <Button size="sm" variant="outline" className="border-gray-700 hover:bg-[#1E2330]">
+              <Mic className="w-4 h-4 mr-2" /> Join Voice
+            </Button>
+          </Link>
          </div>
        </header>
  
