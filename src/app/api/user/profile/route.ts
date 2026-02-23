@@ -1,68 +1,43 @@
-// src/app/api/user/profile/route.ts
-// User XP, Level, and Profile management
-
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { supabaseAdmin } from '@/lib/supabase';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
-// GET: Fetch user profile (xp, level, stats)
+// GET /api/user/profile?userId=xxx
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const userId = searchParams.get('userId');
+  if (!userId) return NextResponse.json({ error: 'userId required' }, { status: 400 });
 
-  if (!userId) {
-    return NextResponse.json({ error: 'userId is required' }, { status: 400 });
-  }
-
-  const { data: profile, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('user_profiles')
-    .select('id, display_name, avatar_url, xp, level, total_sessions, created_at')
+    .select('*')
     .eq('id', userId)
     .single();
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-
-  // Calculate XP needed for next level
-  const xpForNextLevel = profile.level * 500;
-  const xpProgress = profile.xp % 500;
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   return NextResponse.json({
     profile: {
-      ...profile,
-      xpProgress,
-      xpForNextLevel,
-      progressPercent: Math.floor((xpProgress / 500) * 100),
+      ...data,
+      xpProgress: data.xp % 500,
+      xpForNextLevel: 500,
+      progressPercent: Math.floor(((data.xp % 500) / 500) * 100),
     },
   });
 }
 
-// POST: Create a new user profile (called on first sign-up)
-export async function POST(req: NextRequest) {
-  const { userId, displayName, avatarUrl } = await req.json();
+// PATCH /api/user/profile — update profile
+export async function PATCH(req: NextRequest) {
+  const { userId, ...updates } = await req.json();
+  if (!userId) return NextResponse.json({ error: 'userId required' }, { status: 400 });
 
-  const { data: profile, error } = await supabase
-    .from('user_profiles')
-    .insert({
-      id: userId,
-      display_name: displayName,
-      avatar_url: avatarUrl || null,
-      xp: 0,
-      level: 1,
-      total_sessions: 0,
-      created_at: new Date().toISOString(),
-    })
-    .select()
-    .single();
+  const allowedFields = ['display_name', 'bio', 'university', 'major', 'avatar_url'];
+  const filtered = Object.fromEntries(
+    Object.entries(updates).filter(([key]) => allowedFields.includes(key))
+  );
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+  const { data, error } = await supabaseAdmin
+    .from('user_profiles').update(filtered).eq('id', userId).select().single();
 
-  return NextResponse.json({ profile });
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json({ profile: data });
 }
