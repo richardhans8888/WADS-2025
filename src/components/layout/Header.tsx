@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from 'next/link';
@@ -23,7 +22,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-export function Header() {
+// Accept onLogout prop from page.tsx
+interface HeaderProps {
+  onLogout?: () => void;
+}
+
+export function Header({ onLogout }: HeaderProps) {
   const [name, setName] = useState<string>("Alex Rivera");
   const [email, setEmail] = useState<string>("alex@mit.edu");
   type NotificationItem = { id: string; title: string; desc?: string; time: string; read?: boolean; href?: string };
@@ -52,6 +56,15 @@ export function Header() {
       localStorage.setItem("notifications", JSON.stringify(seed));
     }
   }, []);
+
+  function handleLogout() {
+    // Clear localStorage first, then call the prop so page.tsx updates state
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('userEmail');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('userRole');
+    onLogout?.();
+  }
 
   function switchTo(nextName: string, nextEmail: string) {
     if (typeof window !== "undefined") {
@@ -213,10 +226,16 @@ export function Header() {
                     <span>My Schedule</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="text-red-600 dark:text-red-400 cursor-pointer" onClick={() => window.location.href = '/'}>
+
+                {/* FIXED: was window.location.href = '/' which skipped state update */}
+                <DropdownMenuItem
+                  className="text-red-600 dark:text-red-400 cursor-pointer"
+                  onClick={handleLogout}
+                >
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Sign Out</span>
                 </DropdownMenuItem>
+
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href="/tutor-studio" className="cursor-pointer">
