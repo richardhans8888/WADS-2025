@@ -1,19 +1,21 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase-admin';
+import { NextRequest, NextResponse } from "next/server";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 
 // GET /api/user/profile?userId=xxx
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const userId = searchParams.get('userId');
-  if (!userId) return NextResponse.json({ error: 'userId required' }, { status: 400 });
+  const userId = searchParams.get("userId");
+  if (!userId)
+    return NextResponse.json({ error: "userId required" }, { status: 400 });
 
   const { data, error } = await supabaseAdmin
-    .from('user_profiles')
-    .select('*')
-    .eq('id', userId)
+    .from("user_profiles")
+    .select("*")
+    .eq("id", userId)
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error)
+    return NextResponse.json({ error: error.message }, { status: 500 });
 
   return NextResponse.json({
     profile: {
@@ -28,16 +30,28 @@ export async function GET(req: NextRequest) {
 // PATCH /api/user/profile — update profile
 export async function PATCH(req: NextRequest) {
   const { userId, ...updates } = await req.json();
-  if (!userId) return NextResponse.json({ error: 'userId required' }, { status: 400 });
+  if (!userId)
+    return NextResponse.json({ error: "userId required" }, { status: 400 });
 
-  const allowedFields = ['display_name', 'bio', 'university', 'major', 'avatar_url'];
+  const allowedFields = [
+    "display_name",
+    "bio",
+    "university",
+    "major",
+    "avatar_url",
+  ];
   const filtered = Object.fromEntries(
-    Object.entries(updates).filter(([key]) => allowedFields.includes(key))
+    Object.entries(updates).filter(([key]) => allowedFields.includes(key)),
   );
 
   const { data, error } = await supabaseAdmin
-    .from('user_profiles').update(filtered).eq('id', userId).select().single();
+    .from("user_profiles")
+    .update(filtered)
+    .eq("id", userId)
+    .select()
+    .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error)
+    return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ profile: data });
 }

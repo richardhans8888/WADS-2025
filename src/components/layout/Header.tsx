@@ -1,12 +1,24 @@
 "use client";
 
-import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
-import { User, Bell, Menu, BookOpen, Trophy, LogOut, CreditCard, Users, Plus, Calendar as CalendarIcon, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
-import { ModeToggle } from '@/components/mode-toggle';
-import { supabase } from '../../lib/supabase';
-const TEST_MODE = process.env.NEXT_PUBLIC_TEST_MODE === 'true';
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
+import {
+  User,
+  Bell,
+  Menu,
+  BookOpen,
+  Trophy,
+  LogOut,
+  CreditCard,
+  Users,
+  Plus,
+  Calendar as CalendarIcon,
+  Loader2,
+} from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { ModeToggle } from "@/components/mode-toggle";
+import { supabase } from "../../lib/supabase";
+const TEST_MODE = process.env.NEXT_PUBLIC_TEST_MODE === "true";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,7 +45,14 @@ export function Header({ onLogout }: HeaderProps) {
   const [email, setEmail] = useState<string>("");
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  type NotificationItem = { id: string; title: string; desc?: string; time: string; read?: boolean; href?: string };
+  type NotificationItem = {
+    id: string;
+    title: string;
+    desc?: string;
+    time: string;
+    read?: boolean;
+    href?: string;
+  };
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const unreadCount = useMemo(
     () => notifications.filter((n) => !n.read).length,
@@ -44,22 +63,24 @@ export function Header({ onLogout }: HeaderProps) {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
-        setEmail(session.user.email || '');
+        setEmail(session.user.email || "");
         setName(
           session.user.user_metadata?.full_name ||
-          session.user.email?.split('@')[0] ||
-          'User'
+            session.user.email?.split("@")[0] ||
+            "User",
         );
       }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
-        setEmail(session.user.email || '');
+        setEmail(session.user.email || "");
         setName(
           session.user.user_metadata?.full_name ||
-          session.user.email?.split('@')[0] ||
-          'User'
+            session.user.email?.split("@")[0] ||
+            "User",
         );
       }
     });
@@ -70,32 +91,48 @@ export function Header({ onLogout }: HeaderProps) {
   // Seed notifications
   useEffect(() => {
     const seed: NotificationItem[] = [
-      { id: "n1", title: "Study Room Starts in 30m", time: "Just now", href: "/forums" },
-      { id: "n2", title: "New Message in Group Chat", time: "5m ago", href: "/chat" },
-      { id: "n3", title: "Payment Receipt Available", time: "1h ago", href: "/purchases", read: true },
+      {
+        id: "n1",
+        title: "Study Room Starts in 30m",
+        time: "Just now",
+        href: "/forums",
+      },
+      {
+        id: "n2",
+        title: "New Message in Group Chat",
+        time: "5m ago",
+        href: "/chat",
+      },
+      {
+        id: "n3",
+        title: "Payment Receipt Available",
+        time: "1h ago",
+        href: "/purchases",
+        read: true,
+      },
     ];
     setNotifications(seed);
   }, []);
 
   async function handleLogout() {
     if (TEST_MODE) {
-      window.location.href = '/';
+      window.location.href = "/";
       return;
     }
     setIsLoggingOut(true);
     try {
       await supabase.auth.signOut();
       onLogout?.();
-      window.location.href = '/';
+      window.location.href = "/";
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
     } finally {
       setIsLoggingOut(false);
     }
   }
 
   function markAllRead() {
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
   }
 
   function clearNotifications() {
@@ -120,33 +157,60 @@ export function Header({ onLogout }: HeaderProps) {
 
         {/* Nav */}
         <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
-          <Link href="/" className="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white transition-colors">Home</Link>
+          <Link
+            href="/"
+            className="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white transition-colors"
+          >
+            Home
+          </Link>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white transition-colors px-2 py-1 rounded">Learn</button>
+              <button className="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white transition-colors px-2 py-1 rounded">
+                Learn
+              </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
               <DropdownMenuItem asChild>
-                <Link href="/tutors" className="cursor-pointer">Find your tutor</Link>
+                <Link href="/tutors" className="cursor-pointer">
+                  Find your tutor
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/learn/modules" className="cursor-pointer">Your modules</Link>
+                <Link href="/learn/modules" className="cursor-pointer">
+                  Your modules
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Link href="/forums" className="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white transition-colors">Study Rooms</Link>
-          <Link href="/groups" className="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white transition-colors">Study Group</Link>
-          <Link href="/ai-tutor" className="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white transition-colors">Learn with AI</Link>
+          <Link
+            href="/forums"
+            className="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white transition-colors"
+          >
+            Study Rooms
+          </Link>
+          <Link
+            href="/groups"
+            className="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white transition-colors"
+          >
+            Study Group
+          </Link>
+          <Link
+            href="/ai-tutor"
+            className="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white transition-colors"
+          >
+            Learn with AI
+          </Link>
         </nav>
 
         {/* Right */}
         <div className="flex items-center gap-4">
           <ModeToggle />
 
-
           <div className="hidden md:flex items-center gap-2 bg-gray-100 dark:bg-[#1E293B] px-3 py-1.5 rounded-full border border-gray-200 dark:border-gray-700">
             <Trophy className="h-4 w-4 text-yellow-500" />
-            <span className="text-xs font-bold text-gray-700 dark:text-white">Lvl 12</span>
+            <span className="text-xs font-bold text-gray-700 dark:text-white">
+              Lvl 12
+            </span>
           </div>
 
           {/* Notifications */}
@@ -154,34 +218,57 @@ export function Header({ onLogout }: HeaderProps) {
             <DropdownMenuTrigger asChild>
               <button className="relative rounded-full p-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10">
                 <Bell className="h-5 w-5" />
-                {unreadCount > 0 && <span className="absolute top-1 right-1 inline-flex h-2 w-2 rounded-full bg-red-500" />}
+                {unreadCount > 0 && (
+                  <span className="absolute top-1 right-1 inline-flex h-2 w-2 rounded-full bg-red-500" />
+                )}
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-80" align="end" forceMount>
               <DropdownMenuLabel className="font-medium flex items-center justify-between">
                 <span>Notifications</span>
-                <span className="text-xs text-gray-500">{unreadCount > 0 ? `${unreadCount} unread` : "All caught up"}</span>
+                <span className="text-xs text-gray-500">
+                  {unreadCount > 0 ? `${unreadCount} unread` : "All caught up"}
+                </span>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <div className="max-h-80 overflow-auto">
                 {notifications.length === 0 ? (
-                  <div className="p-3 text-sm text-gray-500">No notifications</div>
-                ) : notifications.map((n) => (
-                  <DropdownMenuItem key={n.id} asChild>
-                    <Link href={n.href || "#"} className="flex items-start gap-2 px-2 py-2">
-                      <div className={`mt-1 h-2 w-2 rounded-full ${n.read ? "bg-gray-300" : "bg-blue-500"}`} />
-                      <div className="flex-1">
-                        <div className="text-sm font-medium">{n.title}</div>
-                        <div className="text-xs text-gray-500">{n.time}</div>
-                      </div>
-                    </Link>
-                  </DropdownMenuItem>
-                ))}
+                  <div className="p-3 text-sm text-gray-500">
+                    No notifications
+                  </div>
+                ) : (
+                  notifications.map((n) => (
+                    <DropdownMenuItem key={n.id} asChild>
+                      <Link
+                        href={n.href || "#"}
+                        className="flex items-start gap-2 px-2 py-2"
+                      >
+                        <div
+                          className={`mt-1 h-2 w-2 rounded-full ${n.read ? "bg-gray-300" : "bg-blue-500"}`}
+                        />
+                        <div className="flex-1">
+                          <div className="text-sm font-medium">{n.title}</div>
+                          <div className="text-xs text-gray-500">{n.time}</div>
+                        </div>
+                      </Link>
+                    </DropdownMenuItem>
+                  ))
+                )}
               </div>
               <DropdownMenuSeparator />
               <div className="flex items-center justify-end gap-2 px-2 pb-2">
-                <button onClick={markAllRead} className="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-200">Mark all read</button>
-                <button onClick={clearNotifications} className="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-200">Clear</button>
+                <button
+                  onClick={markAllRead}
+                  className="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-200"
+                >
+                  Mark all read
+                </button>
+                <button
+                  onClick={clearNotifications}
+                  className="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-200"
+                >
+                  Clear
+                </button>
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -210,17 +297,20 @@ export function Header({ onLogout }: HeaderProps) {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href="/profile" className="cursor-pointer">
-                    <User className="mr-2 h-4 w-4" /><span>Account</span>
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Account</span>
                   </Link>
                 </DropdownMenuItem>
                 <DialogTrigger asChild>
                   <DropdownMenuItem>
-                    <Users className="mr-2 h-4 w-4" /><span>Switch Account</span>
+                    <Users className="mr-2 h-4 w-4" />
+                    <span>Switch Account</span>
                   </DropdownMenuItem>
                 </DialogTrigger>
                 <DropdownMenuItem asChild>
                   <Link href="/schedule" className="cursor-pointer">
-                    <CalendarIcon className="mr-2 h-4 w-4" /><span>My Schedule</span>
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    <span>My Schedule</span>
                   </Link>
                 </DropdownMenuItem>
 
@@ -230,21 +320,25 @@ export function Header({ onLogout }: HeaderProps) {
                   onClick={handleLogout}
                   disabled={isLoggingOut}
                 >
-                  {isLoggingOut
-                    ? <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    : <LogOut className="mr-2 h-4 w-4" />}
-                  <span>{isLoggingOut ? 'Signing out...' : 'Sign Out'}</span>
+                  {isLoggingOut ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <LogOut className="mr-2 h-4 w-4" />
+                  )}
+                  <span>{isLoggingOut ? "Signing out..." : "Sign Out"}</span>
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href="/tutor-studio" className="cursor-pointer">
-                    <BookOpen className="mr-2 h-4 w-4" /><span>Tutor Studio</span>
+                    <BookOpen className="mr-2 h-4 w-4" />
+                    <span>Tutor Studio</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/purchases" className="cursor-pointer">
-                    <CreditCard className="mr-2 h-4 w-4" /><span>Purchase & Memberships</span>
+                    <CreditCard className="mr-2 h-4 w-4" />
+                    <span>Purchase & Memberships</span>
                   </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -269,8 +363,12 @@ export function Header({ onLogout }: HeaderProps) {
                       </div>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">{name}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{email}</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        {name}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {email}
+                      </p>
                     </div>
                   </div>
                   <div className="h-2 w-2 rounded-full bg-green-500"></div>
@@ -281,7 +379,9 @@ export function Header({ onLogout }: HeaderProps) {
                     <span className="w-full border-t border-gray-200 dark:border-gray-800" />
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-white dark:bg-[#0F1117] px-2 text-gray-500">Or</span>
+                    <span className="bg-white dark:bg-[#0F1117] px-2 text-gray-500">
+                      Or
+                    </span>
                   </div>
                 </div>
 
@@ -297,7 +397,11 @@ export function Header({ onLogout }: HeaderProps) {
             </DialogContent>
           </Dialog>
 
-          <Button variant="ghost" size="icon" className="md:hidden text-gray-500 dark:text-gray-400">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden text-gray-500 dark:text-gray-400"
+          >
             <Menu className="h-5 w-5" />
           </Button>
         </div>
