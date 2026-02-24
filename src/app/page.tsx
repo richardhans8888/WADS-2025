@@ -9,6 +9,8 @@ import ColorThief from 'colorthief';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '../lib/supabase';
 
+const TEST_MODE = process.env.NEXT_PUBLIC_TEST_MODE === 'true';
+
 type AuthModal = null | 'signup' | 'signin';
 
 export default function Home() {
@@ -26,26 +28,13 @@ export default function Home() {
   const searchParams = useSearchParams();
   const forceAuth = typeof window !== 'undefined' && (searchParams.get('add_account') === '1');
 
-  // Check Supabase session on mount
   useEffect(() => {
-  // TEST MODE: skips Supabase auth
-  if (process.env.NEXT_PUBLIC_TEST_MODE === 'true') {
-    setSession(true);
-    return;
-  }
+    // TEST MODE: skip Supabase auth entirely
+    if (TEST_MODE) {
+      setSession(true);
+      return;
+    }
 
-  supabase.auth.getSession().then(({ data: { session } }) => {
-    setSession(!!session);
-  });
-
-  const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-    setSession(!!session);
-  });
-
-  return () => subscription.unsubscribe();
-  }, []);
-
-  useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(!!session);
     });
@@ -83,6 +72,7 @@ export default function Home() {
   };
 
   const handleGoogleSignIn = async () => {
+    if (TEST_MODE) { setSession(true); return; }
     setIsLoading(true);
     setError(null);
     try {
@@ -98,6 +88,13 @@ export default function Home() {
   };
 
   const handleEmailAuth = async () => {
+    // TEST MODE: any credentials work
+    if (TEST_MODE) {
+      setSession(true);
+      setAuthModal(null);
+      return;
+    }
+
     if (!email || !password) { setError('Email and password are required'); return; }
     if (authModal === 'signup' && !displayName) { setError('Display name is required'); return; }
     if (password.length < 6) { setError('Password must be at least 6 characters'); return; }
@@ -127,7 +124,6 @@ export default function Home() {
     }
   };
 
-  // Show dashboard if logged in
   if (session && !forceAuth) {
     return (
       <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-[#0F172A] transition-colors duration-300">
@@ -182,6 +178,14 @@ export default function Home() {
           <h1 className="font-serif text-5xl md:text-[56px] font-bold text-gray-900 mb-3 tracking-tight">Happening now</h1>
           <p className="text-2xl font-medium text-gray-500 mb-12">Join ClassMate today.</p>
 
+          {/* Test mode banner */}
+          {TEST_MODE && (
+            <div className="mb-6 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-center gap-2">
+              <span>🧪</span>
+              <span><strong>Test mode on</strong> — any button logs you in instantly. Set <code>NEXT_PUBLIC_TEST_MODE=false</code> to disable.</span>
+            </div>
+          )}
+
           {success && (
             <div className="mb-4 text-sm text-green-600 bg-green-50 border border-green-200 rounded-xl p-3">
               {success}
@@ -189,7 +193,6 @@ export default function Home() {
           )}
 
           <div className="space-y-4">
-            {/* Google */}
             <Button
               variant="outline"
               className="w-full rounded-full bg-white text-gray-700 hover:bg-gray-50 border-gray-200 h-12 font-medium text-base flex items-center justify-center gap-3 transition-all"
@@ -205,11 +208,10 @@ export default function Home() {
               Sign up with Google
             </Button>
 
-            {/* Apple */}
             <Button
               variant="outline"
               className="w-full rounded-full bg-white text-gray-700 hover:bg-gray-50 border-gray-200 h-12 font-medium text-base flex items-center justify-center gap-3 transition-all"
-              onClick={() => setError('Apple sign in coming soon')}
+              onClick={() => TEST_MODE ? setSession(true) : setError('Apple sign in coming soon')}
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.64 3.4 1.63-3.12 1.88-2.6 5.79.43 7.1-.7 1.75-1.6 3.44-2.48 4.28zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
@@ -223,11 +225,10 @@ export default function Home() {
               <div className="h-px bg-gray-200 flex-1"></div>
             </div>
 
-            {/* Create account → opens signup modal */}
             <Button
               className="w-full rounded-full text-white border-none h-12 font-bold text-base shadow-sm hover:shadow transition-all duration-500 hover:brightness-110 flex items-center justify-center"
               style={{ backgroundColor: themeColor }}
-              onClick={() => openModal('signup')}
+              onClick={() => TEST_MODE ? setSession(true) : openModal('signup')}
               disabled={isLoading}
             >
               Create account
@@ -242,12 +243,11 @@ export default function Home() {
 
             <div className="pt-12">
               <h3 className="text-base font-bold text-gray-900 mb-4">Already have an account?</h3>
-              {/* Sign in → opens signin modal */}
               <Button
                 variant="outline"
                 className="w-full rounded-full bg-white border-gray-200 hover:bg-gray-50 h-12 font-bold text-base transition-colors duration-500 flex items-center justify-center"
                 style={{ color: themeColor }}
-                onClick={() => openModal('signin')}
+                onClick={() => TEST_MODE ? setSession(true) : openModal('signin')}
                 disabled={isLoading}
               >
                 Sign in
@@ -261,7 +261,6 @@ export default function Home() {
       {authModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl relative">
-            {/* Close */}
             <button
               onClick={() => { setAuthModal(null); resetForm(); }}
               className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
@@ -277,9 +276,7 @@ export default function Home() {
             </p>
 
             {error && (
-              <div className="text-sm text-red-500 bg-red-50 border border-red-200 rounded-xl p-3 mb-4">
-                {error}
-              </div>
+              <div className="text-sm text-red-500 bg-red-50 border border-red-200 rounded-xl p-3 mb-4">{error}</div>
             )}
 
             <div className="space-y-4">
@@ -350,7 +347,7 @@ export default function Home() {
               <p className="text-center text-sm text-gray-500">
                 {authModal === 'signup' ? 'Already have an account? ' : "Don't have an account? "}
                 <button
-                  onClick={() => { openModal(authModal === 'signup' ? 'signin' : 'signup'); }}
+                  onClick={() => openModal(authModal === 'signup' ? 'signin' : 'signup')}
                   className="font-medium hover:underline"
                   style={{ color: themeColor }}
                 >

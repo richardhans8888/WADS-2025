@@ -6,6 +6,7 @@ import { User, Bell, Menu, BookOpen, Trophy, LogOut, CreditCard, Users, Plus, Ca
 import { Button } from '@/components/ui/Button';
 import { ModeToggle } from '@/components/mode-toggle';
 import { supabase } from '../../lib/supabase';
+const TEST_MODE = process.env.NEXT_PUBLIC_TEST_MODE === 'true';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -72,8 +73,9 @@ export function Header({ onLogout }: HeaderProps) {
     ];
     setNotifications(seed);
   }, []);
+
   async function handleLogout() {
-  if (process.env.NEXT_PUBLIC_TEST_MODE === 'true') {
+    if (TEST_MODE) {
       window.location.href = '/';
       return;
     }
@@ -88,18 +90,6 @@ export function Header({ onLogout }: HeaderProps) {
       setIsLoggingOut(false);
     }
   }
-  // async function handleLogout() {
-  //   setIsLoggingOut(true);
-  //   try {
-  //     await supabase.auth.signOut();
-  //     onLogout?.();
-  //     window.location.href = '/';
-  //   } catch (error) {
-  //     console.error('Logout error:', error);
-  //   } finally {
-  //     setIsLoggingOut(false);
-  //   }
-  // }
 
   function markAllRead() {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
