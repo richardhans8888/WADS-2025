@@ -72,8 +72,11 @@ export function Header({ onLogout }: HeaderProps) {
     ];
     setNotifications(seed);
   }, []);
-
   async function handleLogout() {
+  if (process.env.NEXT_PUBLIC_TEST_MODE === 'true') {
+      window.location.href = '/';
+      return;
+    }
     setIsLoggingOut(true);
     try {
       await supabase.auth.signOut();
@@ -85,6 +88,18 @@ export function Header({ onLogout }: HeaderProps) {
       setIsLoggingOut(false);
     }
   }
+  // async function handleLogout() {
+  //   setIsLoggingOut(true);
+  //   try {
+  //     await supabase.auth.signOut();
+  //     onLogout?.();
+  //     window.location.href = '/';
+  //   } catch (error) {
+  //     console.error('Logout error:', error);
+  //   } finally {
+  //     setIsLoggingOut(false);
+  //   }
+  // }
 
   function markAllRead() {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));

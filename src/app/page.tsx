@@ -28,6 +28,24 @@ export default function Home() {
 
   // Check Supabase session on mount
   useEffect(() => {
+  // TEST MODE: skips Supabase auth
+  if (process.env.NEXT_PUBLIC_TEST_MODE === 'true') {
+    setSession(true);
+    return;
+  }
+
+  supabase.auth.getSession().then(({ data: { session } }) => {
+    setSession(!!session);
+  });
+
+  const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    setSession(!!session);
+  });
+
+  return () => subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(!!session);
     });
