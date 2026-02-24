@@ -2,37 +2,9 @@ import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
-// Client-side (respects RLS) — use in frontend components
+// Client-side Supabase — safe to use in frontend components
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
-// Server-side (bypasses RLS) — use in API routes ONLY
-export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
-
-export async function signUpWithEmail(email: string, password: string, displayName: string) {
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: { data: { full_name: displayName } },
-  });
-  if (error) throw error;
-  return data;
-}
-
-export async function signInWithEmail(email: string, password: string) {
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) throw error;
-  return data;
-}
-
-export async function signInWithGoogle() {
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: { redirectTo: `${window.location.origin}/auth/callback` },
-  });
-  if (error) throw error;
-}
 
 export async function signOut() {
   const { error } = await supabase.auth.signOut();
