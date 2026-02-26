@@ -4,9 +4,13 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 // POST /api/study-groups/[groupId]/join
 export async function POST(
   req: NextRequest,
+<<<<<<< HEAD
   { params }: { params: { groupId: string } },
+=======
+  context: { params: Promise<{ groupId: string }> }
+>>>>>>> 3ec0163 (Your module added)
 ) {
-  const { groupId } = params;
+  const { groupId } = await context.params;
   const { userId, inviteCode } = await req.json();
   if (!userId)
     return NextResponse.json({ error: "userId required" }, { status: 400 });
@@ -75,9 +79,13 @@ export async function POST(
 // DELETE /api/study-groups/[groupId]/join — leave group
 export async function DELETE(
   req: NextRequest,
+<<<<<<< HEAD
   { params }: { params: { groupId: string } },
+=======
+  context: { params: Promise<{ groupId: string }> }
+>>>>>>> 3ec0163 (Your module added)
 ) {
-  const { groupId } = params;
+  const { groupId } = await context.params;
   const { searchParams } = new URL(req.url);
   const userId = searchParams.get("userId");
   if (!userId)

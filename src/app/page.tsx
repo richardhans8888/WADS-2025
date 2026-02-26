@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Dashboard from '@/components/Dashboard';
 import { Header } from '@/components/layout/Header';
 import { Button } from '@/components/ui/Button';
@@ -124,18 +124,16 @@ export default function Home() {
     }
   };
 
-  if (session && !forceAuth) {
-    return (
-      <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-[#0F172A] transition-colors duration-300">
-        <Header />
-        <main className="flex-1">
-          <Dashboard />
-        </main>
-      </div>
-    );
-  }
+  const Authed = (
+    <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-[#0F172A] transition-colors duration-300">
+      <Header />
+      <main className="flex-1">
+        <Dashboard />
+      </main>
+    </div>
+  );
 
-  return (
+  const Unauthed = (
     <div className="min-h-screen bg-white flex flex-col lg:flex-row">
       {/* Left Panel */}
       <div className="hidden lg:flex lg:w-1/2 relative bg-gray-900 overflow-hidden">
@@ -387,5 +385,15 @@ export default function Home() {
       )}
     </div>
   );
+<<<<<<< HEAD
 }
 
+=======
+
+  return (
+    <Suspense fallback={<div className="min-h-screen grid place-items-center text-gray-500">Loading…</div>}>
+      {session && !forceAuth ? Authed : Unauthed}
+    </Suspense>
+  );
+}
+>>>>>>> 3ec0163 (Your module added)

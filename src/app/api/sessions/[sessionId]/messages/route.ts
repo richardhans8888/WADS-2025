@@ -11,9 +11,13 @@ const supabase = createClient(
 
 export async function GET(
   req: NextRequest,
+<<<<<<< HEAD
   { params }: { params: { sessionId: string } },
+=======
+  context: { params: Promise<{ sessionId: string }> }
+>>>>>>> 3ec0163 (Your module added)
 ) {
-  const { sessionId } = params;
+  const { sessionId } = await context.params;
   const { searchParams } = new URL(req.url);
   const userId = searchParams.get("userId");
 

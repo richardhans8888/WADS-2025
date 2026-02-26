@@ -4,9 +4,13 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 // GET /api/study-groups/[groupId]/messages
 export async function GET(
   req: NextRequest,
+<<<<<<< HEAD
   { params }: { params: { groupId: string } },
+=======
+  context: { params: Promise<{ groupId: string }> }
+>>>>>>> 3ec0163 (Your module added)
 ) {
-  const { groupId } = params;
+  const { groupId } = await context.params;
 
   const { data, error } = await supabaseAdmin
     .from("study_group_messages")
@@ -23,9 +27,13 @@ export async function GET(
 // POST /api/study-groups/[groupId]/messages — send a message
 export async function POST(
   req: NextRequest,
+<<<<<<< HEAD
   { params }: { params: { groupId: string } },
+=======
+  context: { params: Promise<{ groupId: string }> }
+>>>>>>> 3ec0163 (Your module added)
 ) {
-  const { groupId } = params;
+  const { groupId } = await context.params;
   const { userId, content } = await req.json();
   if (!userId || !content)
     return NextResponse.json(
